@@ -66,8 +66,4 @@ public class Sprite {
 		this.filename = filename;
 		this.rect = new Rectangle(this.x, this.y, this.width, this.height);
 	}
-
-	public void Display() {
-		System.out.println("x, y: " + this.x + ", " + this.y);
-	}
 }

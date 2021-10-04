@@ -76,7 +76,8 @@ public class Ghosts extends Sprite implements Runnable{
 		resetPics();
 		
 		while(Move) {
-			Score += 100;
+			Score += 10;
+			
 			int GhostX = this.x;
 			int GhostY = this.y;
 			

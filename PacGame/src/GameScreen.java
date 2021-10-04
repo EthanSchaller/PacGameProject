@@ -9,10 +9,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JFrame;
 
 public class GameScreen extends JFrame implements ActionListener, KeyListener {
-	
+	private static final long serialVersionUID = 3221260907688321217L;
+
 	private Pacman Pac;
 	private Ghosts Ghost1, Ghost2, Ghost3, Ghost4;
 	
