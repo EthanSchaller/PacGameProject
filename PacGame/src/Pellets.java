@@ -4,13 +4,13 @@ public class Pellets extends Sprite{
 	private Boolean got;
 	
 	public Pellets() {
-		super(50, 50, "Pellet.png");
+		super(20, 20, "Pellet.png");
 		this.Vis = true;
 		this.dupe = false;
 	}
 	
 	public Pellets(String temp) {
-		super(50, 50, "pPellet.png");
+		super(20, 20, "pPellet.png");
 		this.Vis = true;
 		this.dupe = false;
 	}

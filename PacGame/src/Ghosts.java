@@ -12,6 +12,9 @@ public class Ghosts extends Sprite implements Runnable{
 	private Thread T;
 	private Pacman Pac;
 	private JButton StartBttn;
+	private ImageIcon picSet = new ImageIcon(getClass().getResource(getFilename()));
+	
+	int GhNum = 0;
 	
 	//setting up getters
 	public Boolean getVisible() {return Vis;}
@@ -37,9 +40,10 @@ public class Ghosts extends Sprite implements Runnable{
 		super(50, 50, "GhostR.gif");
 		this.Vis = true;
 		this.Move = false;
+		GhNum = i;
 		
 		//taking the entered variable to set the right ghost's color
-		switch(i) {
+		switch(GhNum) {
 			case 1: this.setFilename("GhostR.gif");
 					break;
 			case 2: this.setFilename("GhostB.gif");
@@ -75,6 +79,21 @@ public class Ghosts extends Sprite implements Runnable{
 	public void resetPics() {
 		GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
 		PacLbl.setIcon(new ImageIcon(getClass().getResource("PacR.gif")));
+	}
+	
+	public void eePics(int i, String a, String b, String c, String d) {
+		switch(GhNum) {
+			case 1: this.setFilename(a);
+					break;
+			case 2: this.setFilename(b);
+					break;
+			case 3: this.setFilename(c);
+					break;
+			case 4: this.setFilename(d);
+					break;
+			default: this.setFilename("");
+					 break;
+		}
 	}
 	
 	public void run() {
