@@ -13,7 +13,7 @@ public class Sprite {
 	public int getWidth() {return width;}
 	public int getHeight() {return height;}
 	public String getFilename() {return filename;}
-	public Rectangle getRectangle() {return this.rect;}
+	public Rectangle getRect() {return this.rect;}
 	public Boolean getDupe() {return this.dupe;}
 	
 	

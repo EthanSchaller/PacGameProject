@@ -12,7 +12,6 @@ public class Ghosts extends Sprite implements Runnable{
 	private Thread T;
 	private Pacman Pac;
 	private JButton StartBttn;
-	private ImageIcon picSet = new ImageIcon(getClass().getResource(getFilename()));
 	
 	int GhNum = 0;
 	
@@ -146,7 +145,7 @@ public class Ghosts extends Sprite implements Runnable{
 			this.plyrCollision();
 			
 			try {
-				Thread.sleep(200);
+				Thread.sleep(150);
 			} catch (Exception e) {
 				
 			}
@@ -157,10 +156,11 @@ public class Ghosts extends Sprite implements Runnable{
 	public boolean plyrCollision() {
 		boolean temp = false;
 		
-		if(this.rect.intersects(Pac.getRectangle())) {
+		if(this.rect.intersects(Pac.getRect())) {
 			this.Move = false;
 			StartBttn.setText("Start");
 			PacLbl.setIcon(new ImageIcon(getClass().getResource("PacDth.gif")));
+			GhostLbl.setVisible(false);
 			temp = true;
 		}
 		

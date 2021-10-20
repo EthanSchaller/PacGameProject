@@ -9,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -25,7 +24,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	private JLabel PacLbl;
 	private ImageIcon PacImg;
 	
-	//allowing for easier switching of pacman's animations(gifs)
+	//allowing for easier switching of pacman's animations(in the form of gifs)
 	private ImageIcon PacU = new ImageIcon(getClass().getResource("PacU.gif"));
 	private ImageIcon PacD = new ImageIcon(getClass().getResource("PacD.gif"));
 	private ImageIcon PacR = new ImageIcon(getClass().getResource("PacR.gif"));
@@ -40,6 +39,11 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	private Ghosts[] Ghost = new Ghosts[5];
 	private JLabel[] GhostLbl = new JLabel[5];
 	private ImageIcon[] GhostImg = new ImageIcon[5];
+	
+	//setting up variables to store the walls info
+	private Walls[] Wall = new Walls[14];
+	private JLabel[] WallLbl = new JLabel[14];
+	private ImageIcon[] WallImg = new ImageIcon[14];
 	
 	//setting up various variables to be used throughout the program
 	private boolean Hit = false;
@@ -97,6 +101,61 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			}
 		}
 		
+		for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+			switch(slctIndx) {
+				case 1, 2: WallLbl[slctIndx] = new JLabel();
+						   Wall[slctIndx] = new Walls("vrtTall");
+						   WallImg[slctIndx] = new ImageIcon(getClass().getResource(Wall[slctIndx].getFilename())) ;
+						   WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+						   WallLbl[slctIndx].setSize(Wall[slctIndx].getWidth(), Wall[slctIndx].getHeight());
+						   break;
+				
+				case 3, 4: WallLbl[slctIndx] = new JLabel();
+						   Wall[slctIndx] = new Walls("vrtShrt");
+						   WallImg[slctIndx] = new ImageIcon(getClass().getResource(Wall[slctIndx].getFilename())) ;
+						   WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+						   WallLbl[slctIndx].setSize(Wall[slctIndx].getWidth(), Wall[slctIndx].getHeight());
+						   break;
+				
+				case 5, 6: WallLbl[slctIndx] = new JLabel();
+						   Wall[slctIndx] = new Walls("hrzWide");
+						   WallImg[slctIndx] = new ImageIcon(getClass().getResource(Wall[slctIndx].getFilename())) ;
+						   WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+						   WallLbl[slctIndx].setSize(Wall[slctIndx].getWidth(), Wall[slctIndx].getHeight());
+						   break;
+				
+				case 7, 8: WallLbl[slctIndx] = new JLabel();
+						   Wall[slctIndx] = new Walls("hrzNrrw");
+						   WallImg[slctIndx] = new ImageIcon(getClass().getResource(Wall[slctIndx].getFilename())) ;
+						   WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+						   WallLbl[slctIndx].setSize(Wall[slctIndx].getWidth(), Wall[slctIndx].getHeight());
+						   break;
+				
+				case 9, 10: WallLbl[slctIndx] = new JLabel();
+							Wall[slctIndx] = new Walls("vrtTiny");
+							WallImg[slctIndx] = new ImageIcon(getClass().getResource(Wall[slctIndx].getFilename())) ;
+							WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+							WallLbl[slctIndx].setSize(Wall[slctIndx].getWidth(), Wall[slctIndx].getHeight());
+							break;
+							
+				case 11, 12: WallLbl[slctIndx] = new JLabel();
+							 Wall[slctIndx] = new Walls("hrzTiny");
+							 WallImg[slctIndx] = new ImageIcon(getClass().getResource(Wall[slctIndx].getFilename())) ;
+							 WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+							 WallLbl[slctIndx].setSize(Wall[slctIndx].getWidth(), Wall[slctIndx].getHeight());
+							 break;
+							 
+				case 13: WallLbl[slctIndx] = new JLabel();
+				 		 Wall[slctIndx] = new Walls("mddlBrk");
+				 		 WallImg[slctIndx] = new ImageIcon(getClass().getResource(Wall[slctIndx].getFilename())) ;
+				 		 WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+				 		 WallLbl[slctIndx].setSize(Wall[slctIndx].getWidth(), Wall[slctIndx].getHeight());
+				 		 break;
+						
+				default: break;
+			}
+		}
+		
 		//loading the pages content and setting the background to black
 		PgContent = getContentPane();
 		PgContent.setBackground(Color.BLACK);
@@ -122,10 +181,57 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			posMod += 283;
 		}
 		
+		//setting the walls in their positions and adding them to the page
+			Wall[1].setX(-2);
+			Wall[1].setY(0);
+			
+			Wall[2].setX(957);
+			Wall[2].setY(0);
+			
+			Wall[3].setX(876);
+			Wall[3].setY((GameProps.SCREEN_HEIGHT - Wall[3].getHeight() - 25)/2);
+			
+			Wall[4].setX(76);
+			Wall[4].setY((GameProps.SCREEN_HEIGHT - Wall[4].getHeight() - 25)/2);
+			
+			Wall[5].setX(-2);
+			Wall[5].setY(0);
+			
+			Wall[6].setX(0);
+			Wall[6].setY(957);
+			
+			Wall[7].setX(165);
+			Wall[7].setY(95);
+			
+			Wall[8].setX(165);
+			Wall[8].setY(GameProps.SCREEN_HEIGHT - 150);
+			
+			Wall[9].setX(157);
+			Wall[9].setY((GameProps.SCREEN_HEIGHT - Wall[9].getHeight() - 25)/2);
+			
+			Wall[10].setX(797);
+			Wall[10].setY((GameProps.SCREEN_HEIGHT - Wall[10].getHeight() - 25)/2);
+			
+			Wall[11].setX((GameProps.SCREEN_WIDTH - Wall[11].getWidth() - 16)/2);
+			Wall[11].setY(200);
+			
+			Wall[12].setX((GameProps.SCREEN_WIDTH - Wall[12].getWidth() - 16)/2);
+			Wall[12].setY(754);
+			
+			Wall[13].setX((GameProps.SCREEN_WIDTH - Wall[13].getWidth() - 16)/2);
+			Wall[13].setY((GameProps.SCREEN_HEIGHT - Wall[13].getHeight() - 30)/2);
+			
+		for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+			add(WallLbl[slctIndx]);
+			WallLbl[slctIndx].setVisible(true);
+			WallLbl[slctIndx].setLocation(Wall[slctIndx].getX(), Wall[slctIndx].getY());
+		}
 		
 		//setting the pellets' starting positions and adding them to the page
 		posMod = 0;
 		posDwnShft = 0;
+		int tempInt = 1;
+		boolean tempCollision = false;
 		
 		for(slctIndx = 1; slctIndx <= 391; slctIndx++) {
 			Plt[slctIndx].setX(40 + posMod);
@@ -135,16 +241,28 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				posDwnShft += 55;
 				
 				Plt[slctIndx].setX(40 + posMod);
+				
+			}
+	
+			Plt[slctIndx].setY(40 + posDwnShft);
+			
+			for(tempInt = 1; tempInt <= 13; tempInt++) {
+				if(Plt[slctIndx].rect.intersects(Wall[tempInt].getRect())) {
+					tempCollision = true;
+					break;
+				} else {
+					tempCollision = false;
+				}
 			}
 			
-			Plt[slctIndx].setY(40 + posDwnShft);
-			add(PltLbl[slctIndx]);
-			PltLbl[slctIndx].setVisible(Plt[slctIndx].getVisible());
-			PltLbl[slctIndx].setLocation(Plt[slctIndx].getX(), Plt[slctIndx].getY());
+			if(!tempCollision) {
+				add(PltLbl[slctIndx]);
+				PltLbl[slctIndx].setVisible(Plt[slctIndx].getVisible());
+				PltLbl[slctIndx].setLocation(Plt[slctIndx].getX(), Plt[slctIndx].getY());
+			}
 			
 			posMod += 40;
 		}
-		
 		
 		//setting the start button's starting position and adding it to the page
 		StartBttn = new JButton("Start");
@@ -295,53 +413,73 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				if(Plt[slctIndx].collected()) {
 					Plt[slctIndx].setDupe(true);
 					PltLbl[slctIndx].setVisible(false);
-					Score += 100;
+					Score += 1000;
 				}
 			}
 		}
 		
 		//making sure the game is running then allowing the player to move
 		if(Hit == false && Ghost[1].getMove() == true) {
-			
 			//testing for the users input and moving pacman accordingly
 			
 			//testing for the UP and W keys
 			if(e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
 				PacY -= GameProps.CHAR_STEP;
 				PacLbl.setIcon(PacU);
-				if(PacY <= 25) {
-					PacY = 25;
-				}
 			
 			//testing for the DOWN and S keys
 			} else if(e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
 				PacY += GameProps.CHAR_STEP;
 				PacLbl.setIcon(PacD);
-				if(PacY >= GameProps.SCREEN_HEIGHT - (40 + Pac.getHeight())) {
-					PacY = Pac.getY();
-				}
 				
 			//testing for the LEFT and A keys	
 			} else if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_LEFT) {
 				PacX -= GameProps.CHAR_STEP;
 				PacLbl.setIcon(PacL);
-				if(PacX <= 25) {
-					PacX = 25;
-				}
 				
 			//testing for the RIGHT and D keys	
 			} else if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() == KeyEvent.VK_RIGHT) {
 				PacX += GameProps.CHAR_STEP;
 				PacLbl.setIcon(PacR);
-				if(PacX >= GameProps.SCREEN_WIDTH - (40 + Pac.getWidth())) {
-					PacX = Pac.getX();
-				}
 			} 
+		} else {
+			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
+				Ghost[slctIndx].setMoving(false);
+				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
+			}
+			
+			StartBttn.setVisible(true);
 		}
 		
 		//setting pacman's x and y
 		Pac.setX(PacX);
 		Pac.setY(PacY);
+		
+		for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+			if(Pac.getRect().intersects(Wall[slctIndx].getRect())) {
+				if(e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
+					PacY += GameProps.CHAR_STEP;
+				} else if(e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
+					PacY -= GameProps.CHAR_STEP;
+				} else if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_LEFT) {
+					if(slctIndx == 1) {
+						PacX = (Wall[1].getX() + Wall[1].getWidth());
+					} else {
+						PacX += GameProps.CHAR_STEP;
+					}
+					
+				} else if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() == KeyEvent.VK_RIGHT) {
+					if(slctIndx == 6) {
+						PacX = GameProps.SCREEN_WIDTH - Wall[6].getWidth();
+					} else {
+						PacX -= GameProps.CHAR_STEP;
+					}
+				}
+				
+				Pac.setX(PacX);
+				Pac.setY(PacY);
+			}
+		}
 		
 		//resetting pacman's location based on the updated x and y position
 		PacLbl.setLocation(Pac.getX(), Pac.getY());
@@ -411,7 +549,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 					PacR = new ImageIcon(getClass().getResource("PacL.gif"));
 					PacL = new ImageIcon(getClass().getResource("PacR.gif"));
 					
-					System.out.println("Code " + EECode.toUpperCase() + " was applied \r\nPacman is now moonwalking where ever he goes");
+					System.out.println("Code " + EECode.toUpperCase() + " was applied \r\nPacman is now moonwalking whereever he goes");
 				
 				} else {
 					//testing if nothing or something that doesn't match a code is entered and reseting animations to normal
@@ -425,7 +563,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 							Ghost[slctIndx].resetPics();
 						}
 						
-						System.out.println("No code was entered, resetting to default game");
+						System.out.println("No code was entered, resetting to game default");
 						
 					} else {
 						PacU = new ImageIcon(getClass().getResource("PacU.gif"));
@@ -437,7 +575,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 							Ghost[slctIndx].eePics(slctIndx, "GhostR.gif", "GhostB.gif", "GhostP.gif", "GhostO.gif");
 						}
 						
-						System.out.println("Invalid code was entered, resetting to default game");
+						System.out.println("Invalid code was entered, resetting to game default");
 					}
 				}
 				
@@ -469,7 +607,11 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			//setting pacman's data to each pellet to track collision
 			for(slctIndx = 1; slctIndx <= 391; slctIndx++) {
 				PltLbl[slctIndx].setVisible(false);
-			}
+			} 
+			
+			for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+				WallLbl[slctIndx].setVisible(false);
+			} 
 			
 		} else if(!StartBttn.isVisible()) {
 			PgContent.setBackground(Color.BLACK);
@@ -482,7 +624,11 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			//setting pacman's data to each pellet to track collision
 			for(slctIndx = 1; slctIndx <= 391; slctIndx++) {
 				PltLbl[slctIndx].setVisible(true);
-			}
+			} 
+			
+			for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+				WallLbl[slctIndx].setVisible(true);
+			} 
 		}
 	}
 	

@@ -16,7 +16,7 @@ public class Pellets extends Sprite{
 	}
 	
 	public Boolean collected() {  
-		if(this.rect.intersects(Pac.getRectangle())) {
+		if(this.rect.intersects(Pac.getRect())) {
 			got = true;
 			this.setVisible(false);
 		} else {
