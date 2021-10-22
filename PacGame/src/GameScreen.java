@@ -65,6 +65,38 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		super("Pac-Man");
 		setSize(GameProps.SCREEN_WIDTH, GameProps.SCREEN_HEIGHT);
 		
+		//setting the start button's starting position and adding it to the page
+		StartBttn = new JButton("Start");
+		StartBttn.setSize(100, 50);
+		StartBttn.setLocation((GameProps.SCREEN_WIDTH - StartBttn.getWidth())/2, ((GameProps.SCREEN_HEIGHT - StartBttn.getHeight())/2) - 75);
+		add(StartBttn);
+		StartBttn.addActionListener(this);
+		StartBttn.setFocusable(false);
+		
+		//button to go to a screen to enter codes
+		ExtraBttn = new JButton("Extras");
+		ExtraBttn.setSize(100, 50);
+		ExtraBttn.setLocation((GameProps.SCREEN_WIDTH - ExtraBttn.getWidth())/2, (GameProps.SCREEN_HEIGHT - ExtraBttn.getHeight())/2);
+		add(ExtraBttn);
+		ExtraBttn.addActionListener(this);
+		ExtraBttn.setFocusable(false);
+		
+		//button to exit the program
+		ExitBttn = new JButton("Exit");
+		ExitBttn.setSize(100, 50);
+		ExitBttn.setLocation((GameProps.SCREEN_WIDTH - ExitBttn.getWidth())/2, ((GameProps.SCREEN_HEIGHT - ExitBttn.getHeight())/2) + 75);
+		add(ExitBttn);
+		ExitBttn.addActionListener(this);
+		ExitBttn.setFocusable(false);
+		
+		//input field to take the users inputed code
+		CodeInpt = new JTextField();
+		CodeInpt.setSize(100, 50);
+		CodeInpt.setLocation((GameProps.SCREEN_WIDTH - StartBttn.getWidth())/2, ((GameProps.SCREEN_HEIGHT - StartBttn.getHeight())/2) - 75);
+		add(CodeInpt);
+		CodeInpt.setVisible(false);
+				
+		
 		//inputting pacman's data into the program
 		PacLbl = new JLabel();
 		Pac = new Pacman();
@@ -163,10 +195,11 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		setLayout(null);
 		
 		//setting pacman's starting position and adding him to the page
-		Pac.setX((GameProps.SCREEN_WIDTH-Pac.getWidth())/2);
-		Pac.setY(25);
+		Pac.setX((GameProps.SCREEN_WIDTH - Pac.getWidth())/2);
+		Pac.setY((GameProps.SCREEN_HEIGHT - Pac.getHeight())/2);
 		add(PacLbl);
 		PacLbl.setLocation(Pac.getX(), Pac.getY());
+		PacLbl.setVisible(false);
 		
 		//setting the ghosts' starting positions and adding them to the page
 		posMod = 0;
@@ -201,10 +234,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			Wall[6].setY(957);
 			
 			Wall[7].setX(165);
-			Wall[7].setY(95);
+			Wall[7].setY(92);
 			
 			Wall[8].setX(165);
-			Wall[8].setY(GameProps.SCREEN_HEIGHT - 150);
+			Wall[8].setY(GameProps.SCREEN_HEIGHT - 155);
 			
 			Wall[9].setX(157);
 			Wall[9].setY((GameProps.SCREEN_HEIGHT - Wall[9].getHeight() - 25)/2);
@@ -213,7 +246,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			Wall[10].setY((GameProps.SCREEN_HEIGHT - Wall[10].getHeight() - 25)/2);
 			
 			Wall[11].setX((GameProps.SCREEN_WIDTH - Wall[11].getWidth() - 16)/2);
-			Wall[11].setY(200);
+			Wall[11].setY(204);
 			
 			Wall[12].setX((GameProps.SCREEN_WIDTH - Wall[12].getWidth() - 16)/2);
 			Wall[12].setY(754);
@@ -247,7 +280,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			Plt[slctIndx].setY(40 + posDwnShft);
 			
 			for(tempInt = 1; tempInt <= 13; tempInt++) {
-				if(Plt[slctIndx].rect.intersects(Wall[tempInt].getRect())) {
+				if(Plt[slctIndx].rect.intersects(Wall[tempInt].getRect()) || Plt[slctIndx].rect.intersects(Pac.getRect())) {
 					tempCollision = true;
 					break;
 				} else {
@@ -264,41 +297,12 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			posMod += 40;
 		}
 		
-		//setting the start button's starting position and adding it to the page
-		StartBttn = new JButton("Start");
-		StartBttn.setSize(100, 50);
-		StartBttn.setLocation((GameProps.SCREEN_WIDTH - StartBttn.getWidth())/2, ((GameProps.SCREEN_HEIGHT - StartBttn.getHeight())/2) - 75);
-		add(StartBttn);
-		StartBttn.addActionListener(this);
-		StartBttn.setFocusable(false);
-		
-		//button to go to a screen to enter codes
-		ExtraBttn = new JButton("Extras");
-		ExtraBttn.setSize(100, 50);
-		ExtraBttn.setLocation((GameProps.SCREEN_WIDTH - ExtraBttn.getWidth())/2, (GameProps.SCREEN_HEIGHT - ExtraBttn.getHeight())/2);
-		add(ExtraBttn);
-		ExtraBttn.addActionListener(this);
-		ExtraBttn.setFocusable(false);
-		
-		//button to exit the program
-		ExitBttn = new JButton("Exit");
-		ExitBttn.setSize(100, 50);
-		ExitBttn.setLocation((GameProps.SCREEN_WIDTH - ExitBttn.getWidth())/2, ((GameProps.SCREEN_HEIGHT - ExitBttn.getHeight())/2) + 75);
-		add(ExitBttn);
-		ExitBttn.addActionListener(this);
-		ExitBttn.setFocusable(false);
-		
-		//input field to take the users inputed code
-		CodeInpt = new JTextField();
-		CodeInpt.setSize(100, 50);
-		CodeInpt.setLocation((GameProps.SCREEN_WIDTH - StartBttn.getWidth())/2, ((GameProps.SCREEN_HEIGHT - StartBttn.getHeight())/2) - 75);
-		add(CodeInpt);
-		CodeInpt.setVisible(false);
 				
 		//setting up the variables in the ghost's data that is set in the Ghosts java file
 		for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
 			Ghost[slctIndx].setGhostLbl(GhostLbl[slctIndx]);
 			Ghost[slctIndx].setPac(Pac);
+			Ghost[slctIndx].setWalls(Wall);
 			Ghost[slctIndx].setPacLbl(PacLbl);
 			Ghost[slctIndx].setStartBttn(StartBttn);
 		}
@@ -382,10 +386,11 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	}
 
 	public void keyPressed(KeyEvent e) {
-		
 		//variables to track pacman's x and y coordinates
 		int PacX = Pac.getX();
 		int PacY = Pac.getY();
+		int PltTrkr = 0;
+		
 		
 		//checking if any ghost is colliding with pacman
 		for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
@@ -398,12 +403,8 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				if(!dupeChck) {
 					System.out.println(" You Lose.\r\n Your score is " + Score);
 					dupeChck = true;
+					loseScreen();
 				}
-				
-				StartBttn.setVisible(true);
-				ExtraBttn.setVisible(true);
-				ExitBttn.setVisible(true);
-				startScreen();
 			}
 		}
 		
@@ -413,13 +414,17 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				if(Plt[slctIndx].collected()) {
 					Plt[slctIndx].setDupe(true);
 					PltLbl[slctIndx].setVisible(false);
-					Score += 1000;
+					if(Plt[slctIndx].getFilename() == "pPellet.png"){
+						Score += 1500;
+					} else {
+						Score += 1000;
+					}
 				}
 			}
 		}
 		
 		//making sure the game is running then allowing the player to move
-		if(Hit == false && Ghost[1].getMove() == true) {
+		if(Hit == false && !ExitBttn.isVisible() && PacLbl.isVisible()) {
 			//testing for the users input and moving pacman accordingly
 			
 			//testing for the UP and W keys
@@ -442,47 +447,53 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				PacX += GameProps.CHAR_STEP;
 				PacLbl.setIcon(PacR);
 			} 
-		} else {
+			
+			//setting pacman's x and y
+			Pac.setX(PacX);
+			Pac.setY(PacY);
+			
+			for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+				if(Pac.getRect().intersects(Wall[slctIndx].getRect())) {
+					if(e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
+						PacY += GameProps.CHAR_STEP;
+					} else if(e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
+						PacY -= GameProps.CHAR_STEP;
+					} else if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_LEFT) {
+						if(slctIndx == 1) {
+							PacX = (Wall[1].getX() + Wall[1].getWidth());
+						} else {
+							PacX += GameProps.CHAR_STEP;
+						}
+						
+					} else if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() == KeyEvent.VK_RIGHT) {
+						if(slctIndx == 6) {
+							PacX = GameProps.SCREEN_WIDTH - Wall[6].getWidth();
+						} else {
+							PacX -= GameProps.CHAR_STEP;
+						}
+					}
+					
+					Pac.setX(PacX);
+					Pac.setY(PacY);
+					
+				}
+			}
+		
+			//resetting pacman's location based on the updated x and y position
+			PacLbl.setLocation(Pac.getX(), Pac.getY());
+			
+			if(Score >= 246000) {
+				winScreen();
+			}
+		
+		} else if(Hit == true && ExitBttn.isVisible() && !PacLbl.isVisible()) {
 			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
 				Ghost[slctIndx].setMoving(false);
 				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
-			}
-			
-			StartBttn.setVisible(true);
-		}
-		
-		//setting pacman's x and y
-		Pac.setX(PacX);
-		Pac.setY(PacY);
-		
-		for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
-			if(Pac.getRect().intersects(Wall[slctIndx].getRect())) {
-				if(e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
-					PacY += GameProps.CHAR_STEP;
-				} else if(e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
-					PacY -= GameProps.CHAR_STEP;
-				} else if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_LEFT) {
-					if(slctIndx == 1) {
-						PacX = (Wall[1].getX() + Wall[1].getWidth());
-					} else {
-						PacX += GameProps.CHAR_STEP;
-					}
-					
-				} else if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() == KeyEvent.VK_RIGHT) {
-					if(slctIndx == 6) {
-						PacX = GameProps.SCREEN_WIDTH - Wall[6].getWidth();
-					} else {
-						PacX -= GameProps.CHAR_STEP;
-					}
-				}
 				
-				Pac.setX(PacX);
-				Pac.setY(PacY);
 			}
+			loseScreen();
 		}
-		
-		//resetting pacman's location based on the updated x and y position
-		PacLbl.setLocation(Pac.getX(), Pac.getY());
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -493,45 +504,51 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				Ghost[slctIndx].setMoving(false);
 				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
 			}
-			
-			StartBttn.setVisible(true);
+			loseScreen();
 		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		
 		//testing if the start button was pressed
 		if(e.getSource() == StartBttn) {
-			StartBttn.setVisible(false);
-			ExtraBttn.setVisible(false);
-			ExitBttn.setVisible(false);
-			startScreen();
-			
-			dupeChck = false;
-			posMod = 0;
-			Score = 0;
-			Hit = false;
-			
-			//resetting the location of pacman at the start of the game
-			Pac.setX((GameProps.SCREEN_WIDTH-Pac.getWidth())/2);
-			Pac.setY(25);
-			PacLbl.setLocation(Pac.getX(), Pac.getY());
-			
-			//resetting the location of the ghosts at the start of the game
-			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
-				Ghost[slctIndx].moveGhost();
-				GhostLbl[slctIndx].setVisible(true);
-				Ghost[slctIndx].setX(50 + posMod);
-				Ghost[slctIndx].setY(900);
-				GhostLbl[slctIndx].setLocation(Ghost[slctIndx].getX(), Ghost[slctIndx].getY());
+			if(ExitBttn.isVisible()) {
+				StartBttn.setVisible(false);
+				StartBttn.setText("Start");
+				ExtraBttn.setVisible(false);
+				ExitBttn.setVisible(false);
+				startScreen();
 				
-				posMod += 283;
-			}
-			
-			//re-showing the pellets and resetting the check to not duplicate the points given
-			for(slctIndx = 1; slctIndx <= 391; slctIndx++) {
-				Plt[slctIndx].setDupe(false);
-				PltLbl[slctIndx].setVisible(true);
+				dupeChck = false;
+				posMod = 0;
+				Score = 0;
+				Hit = false;
+				
+				//resetting the location of pacman at the start of the game
+				Pac.setX((GameProps.SCREEN_WIDTH-Pac.getWidth())/2);
+				Pac.setY(25);
+				PacLbl.setLocation(Pac.getX(), Pac.getY());
+				
+				//resetting the location of the ghosts at the start of the game
+				for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
+					Ghost[slctIndx].moveGhost();
+					GhostLbl[slctIndx].setVisible(true);
+					Ghost[slctIndx].setX(50 + posMod);
+					Ghost[slctIndx].setY(900);
+					GhostLbl[slctIndx].setLocation(Ghost[slctIndx].getX(), Ghost[slctIndx].getY());
+					
+					posMod += 283;
+				}
+				
+				//re-showing the pellets and resetting the check to not duplicate the points given
+				for(slctIndx = 1; slctIndx <= 391; slctIndx++) {
+					Plt[slctIndx].setDupe(false);
+					PltLbl[slctIndx].setVisible(true);
+				}
+			} else if(!ExitBttn.isVisible()) {
+				StartBttn.setVisible(true);
+				ExtraBttn.setVisible(true);
+				ExitBttn.setVisible(true);
+				startScreen();
 			}
 			
 		} else if(e.getSource() == ExtraBttn) {
@@ -598,6 +615,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	
 	public void startScreen() {
 		if(StartBttn.isVisible()) {
+			if(ExitBttn.isVisible()) {
+				StartBttn.setText("Start");
+			}
+			
 			PacLbl.setVisible(false);
 			
 			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
@@ -650,4 +671,22 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		}
 		
 	}
+	
+	public void  loseScreen() {
+		StartBttn.setVisible(true);
+		StartBttn.setText("You Lose");
+		startScreen();
+		PacLbl.setVisible(true);
+		Pac.setX((GameProps.SCREEN_WIDTH - Pac.getWidth())/2);
+		Pac.setY((GameProps.SCREEN_HEIGHT - Pac.getHeight())/2);
+	}
+	
+	public void  winScreen() {
+		StartBttn.setVisible(true);
+		StartBttn.setText("You Win");
+		startScreen();
+	}
 }
+
+
+

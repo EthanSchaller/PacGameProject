@@ -26,6 +26,10 @@ public class Pellets extends Sprite{
 		return got;
 	}
 	
+	public Boolean isCollected() {
+		return !this.getVisible();
+	}
+	
 	public Boolean getVisible() {return Vis;}
 	public void setVisible(Boolean temp) {this.Vis = temp;}
 	public void setPac(Pacman temp) {this.Pac = temp;}
