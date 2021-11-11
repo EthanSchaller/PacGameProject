@@ -17,10 +17,14 @@ public class Ghosts extends Sprite implements Runnable{
 	int GhNum = 0;
 	int wallNum = 0;
 	String[] mvDir = new String[4];
+	boolean Vul = false;
+	boolean Eaten = false;
+	int eatTimer = 0;
 	
 	//setting up getters
 	public Boolean getVisible() {return Vis;}
 	public Boolean getMove() {return Move;}
+	public Boolean getEaten() {return Eaten;}
 	
 	//setting up setters
 	public void setVisible(Boolean temp) {this.Vis = temp;}
@@ -79,28 +83,36 @@ public class Ghosts extends Sprite implements Runnable{
 	}
 	
 	//reseting the pictures
-	public void resetPics() {
+	public void setPics() {
 		GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
 		PacLbl.setIcon(new ImageIcon(getClass().getResource("PacR.gif")));
 	}
 	
 	public void eePics(int i, String a, String b, String c, String d) {
-		switch(GhNum) {
-			case 1: this.setFilename(a);
+		switch(i) {
+			case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource(a)));
 					break;
-			case 2: this.setFilename(b);
+			case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource(b)));
 					break;
-			case 3: this.setFilename(c);
+			case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource(c)));
 					break;
-			case 4: this.setFilename(d);
+			case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource(d)));
 					break;
-			default: this.setFilename("");
+			default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
 					 break;
 		}
 	}
 	
+	public void ghVlnrbl() {
+		GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostV.gif")));
+		Vul = true;
+	}
+	
+	public void ghEaten(int i) {
+		GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostEat.png")));
+	}
+	
 	public int[] shdwMv(int[] GXY, int[] PXY) {
-		
 		//moving the ghosts depending on the position of pacman
 		if(GXY[1] > PXY[1]) {
 			GXY[1] -= GameProps.GHST_STEP /2;
@@ -170,7 +182,7 @@ public class Ghosts extends Sprite implements Runnable{
 		return GXY;
 	}
 	
-	public int[] nrmMv(int[] GXY, String mv) {
+	public int[] nrmMv(int[] GXY, String mv, int timer) {
 		if(mv == "U") {
 			GXY[2] -= GameProps.GHST_STEP;
 		} else if(mv == "D") {
@@ -202,7 +214,47 @@ public class Ghosts extends Sprite implements Runnable{
 					}
 				}
 				
-				mvDir[GhNum] = mvSwp();
+				
+				mvDir[GhNum] = mvSwp(GXY);
+			}
+		}
+		if(timer == 0) {
+			mvDir[GhNum] = mvSwp(GXY);
+		}
+		
+		return GXY;
+	}
+	
+	public int[] eatMv(int[] GXY) {
+		String mv = "";
+		
+		//moving the ghosts to the center of the screen(somewhat, but kind of weird)
+		if(GXY[1] > GameProps.SCREEN_HEIGHT/2) {
+			GXY[1] -= GameProps.GHST_STEP;
+			mv = "U";
+		} else if(GXY[1] < GameProps.SCREEN_HEIGHT/2) {
+			GXY[1] += GameProps.GHST_STEP;
+			mv = "D";
+		}
+		
+		if(GXY[2] > GameProps.SCREEN_WIDTH/2) {
+			GXY[2] -= GameProps.GHST_STEP;
+			mv = "L";
+		} else if(GXY[2] < GameProps.SCREEN_WIDTH/2) {
+			GXY[2] += GameProps.GHST_STEP;
+			mv = "R";
+		}
+		
+		//only put wall interactions with the middle wall
+		if(this.getRect().intersects(Wall[13].getRect())) {
+			if(mv == "U") {
+				GXY[2] += GameProps.GHST_STEP * 2;
+			} else if(mv == "D") {
+				GXY[2] -= GameProps.GHST_STEP * 2;
+			} else if(mv == "L") {
+				GXY[1] += GameProps.GHST_STEP * 2;
+			} else if(mv == "R") {
+				GXY[1] -= GameProps.GHST_STEP * 2;
 			}
 		}
 		
@@ -210,19 +262,19 @@ public class Ghosts extends Sprite implements Runnable{
 	}
 	
 	public void run() {
-		
 		//starting the movement
 		this.Move = true;
 		
-		resetPics();
+		setPics();
 		
 		mvDir[1] = "U";
 		mvDir[2] = "L";
 		mvDir[3] = "R";
+		int intrnlTimer = 100;
+		int pPelTimer = 2000;
 		
 		//looping until the a collision happens and the ghosts stop moving
 		while(Move) {
-			
 			//collecting the ghost's and pacman's position to variables
 			int[] PacXY = new int[3];
 			int[] GhostXY = new int[3];
@@ -233,129 +285,217 @@ public class Ghosts extends Sprite implements Runnable{
 			PacXY[1] = Pac.getX();
 			PacXY[2] = Pac.getY();
 			
-			switch(GhNum) {
-				case 1: GhostXY = nrmMv(GhostXY, mvDir[GhNum]);
-						try {
-							Thread.sleep(5);
-						} catch (Exception e) {
+			//changing the movement type for the normal pattern if it is eaten or not
+			if(Eaten == false) {
+				switch(GhNum) {
+					case 1: GhostXY = nrmMv(GhostXY, mvDir[GhNum], intrnlTimer);
+							try {
+								Thread.sleep(5);
+							} catch (Exception e) {
+								
+							}
+							break;
 							
-						}
-						break;
-						
-				case 2: GhostXY = nrmMv(GhostXY, mvDir[GhNum]);
-						try {
-							Thread.sleep(5);
-						} catch (Exception e) {
+					case 2: GhostXY = nrmMv(GhostXY, mvDir[GhNum], intrnlTimer);
+							try {
+								Thread.sleep(5);
+							} catch (Exception e) {
+								
+							}
+							break;
 							
-						}
-						break;
-						
-				case 3: GhostXY = prmMv(GhostXY, mvDir[GhNum]);
-						try {
-							Thread.sleep(4);
-						} catch (Exception e) {
+					case 3: GhostXY = prmMv(GhostXY, mvDir[GhNum]);
+							try {
+								Thread.sleep(4);
+							} catch (Exception e) {
+								
+							}
+							break;
+					
+					case 4:	GhostXY = shdwMv(GhostXY, PacXY);
+							try {
+								Thread.sleep(4);
+							} catch (Exception e) {
+								
+							}
+							break;
 							
-						}
-						break;
-				
-				case 4:	GhostXY = shdwMv(GhostXY, PacXY);
-						try {
-							Thread.sleep(4);
-						} catch (Exception e) {
-							
-						}
-						break;
-						
-				default: break;
+					default: break;
+				}
+			} else {
+				GhostXY = eatMv(GhostXY);
+				try {
+					Thread.sleep(4);
+				} catch (Exception e) {
+					
+				}
+			} 
+			
+			//lowering the internal timer for the new movement system for R and B
+			intrnlTimer--;
+			
+			//if the timer is lower than 0 it is reset to 100
+			if(intrnlTimer < 0) {
+				intrnlTimer = 100;
 			}
+			
 			//setting the ghost's x and y
 			this.setX(GhostXY[1]);
 			this.setY(GhostXY[2]);
 			
 			//re-setting the ghost's location based on the x and y positions
 			GhostLbl.setLocation(this.x, this.y);
+			
+			//checking if pacman eat a power pellet recently or not
+			if(Pac.powerPac == true) {
+				//if the pPellet timer is 0 or lower than the timer is set back to 2000, the powerPac variable is set to false, and the Vulnerable variable is set to false
+				if(pPelTimer <= 0) {
+					pPelTimer = 2000;
+					Pac.powerPac = false;
+					Vul = false;
+				
+				//if the pPellet timer is above 0 then it is lowered by 1
+				} else {
+					pPelTimer--;
+				}
+			
+			//if the ghost is not eaten and the powerPac variable is false, the ghosts are set to their original gifs
+			} else if(Eaten == false) {
+				switch(GhNum) {
+					case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
+							break;
+					case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostB.gif")));
+							break;
+					case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostP.gif")));
+							break;
+					case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostO.gif")));
+							break;
+					default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
+							 break;
+				}
+			}
+			
+			//if the ghost is eaten loop through this code
+			if(Eaten == true) {
+				//testing if the timer ran out
+				if(eatTimer <= 0) {
+					//if the timer ran out then change the ghosts Eaten variable to false and change the images back to their default
+					Eaten = false;
+					switch(GhNum) {
+						case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
+								break;
+						case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostB.gif")));
+								break;
+						case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostP.gif")));
+								break;
+						case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostO.gif")));
+								break;
+						default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
+								 break;
+					}
+					
+				//if the timer isn't 0 reduce it by one
+				} else {
+					eatTimer--;
+				}
+			}
+			//check for player collision
 			this.plyrCollision();
 		}
 	}
 	
 	//function to check for the ghosts collision with pacman
 	public boolean plyrCollision() {
+		//temp variable is created to track if a collision is found
 		boolean temp = false;
 		
+		//testing if the ghost and pacman intersect or not
 		if(this.rect.intersects(Pac.getRect())) {
-			this.Move = false;
-			StartBttn.setText("Start");
-			PacLbl.setIcon(new ImageIcon(getClass().getResource("PacDth.gif")));
-			PacLbl.setLocation((GameProps.SCREEN_WIDTH - Pac.getWidth())/2, (GameProps.SCREEN_HEIGHT - Pac.getHeight())/2);
-			GhostLbl.setVisible(false);
-			temp = true;
+			//if pacman is not eaten and if the ghost is not vulnerable run this code
+			if(Vul == false && Eaten == false) {
+				//ghost is stopped from moving
+				this.Move = false;
+				
+				//start button is set to display 'Start' on it
+				StartBttn.setText("Start");
+				
+				//pacman is set to its death animation nad set to the center of the screen
+				PacLbl.setIcon(new ImageIcon(getClass().getResource("PacDth.gif")));
+				PacLbl.setLocation((GameProps.SCREEN_WIDTH - Pac.getWidth())/2, (GameProps.SCREEN_HEIGHT - Pac.getHeight())/2);
+				
+				//ghost is hidden and the temp variable is set to true
+				GhostLbl.setVisible(false);
+				temp = true;
+			
+			//if the ghost is vulnerable run this code
+			} else if(Vul == true) {
+				//set the ghosts image to that of its eaten form
+				GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostEat.png")));
+				
+				//reset the eaten timer, set the Ghost to Eaten and not Vulnerable
+				eatTimer = 1000;
+				Eaten = true;
+				Vul = false;
+			} 
 		}
 		
+		//return the temp value that represents if a collision was found
 		return temp;
 	}
 	
-	public String mvSwp() {
+	
+	//movement swapper for the updated movement system, its not the best but it works
+	public String mvSwp(int[] GXY) {
 		String s = "";
-		int i = (int)(Math.random() * 6);
+		int i = (int)(Math.random() * 5);
 		
-		if(this.getY() < PacLbl.getY()) {
+		if(GXY[2] < PacLbl.getY()) {
 			switch(i) {
-				case 0, 4, 5: s = "U";
-						   	  break;
-				
-				case 1: s = "D";
-						break; 
+				case 0, 1, 4: s = "D";
+						   	   break;
 				
 				case 2: s = "L";
-						break;
+							break;
 				
 				case 3: s = "R";
-						break;
+							break;
 			}
 			
-		} else  if(this.getX() < PacLbl.getX()) {
+		} else if(GXY[2] > PacLbl.getY()) {
 			switch(i) {
-				case 0: s = "U";
-						break;
-				
-				case 1: s = "D";
-						break; 
+				case 0, 1, 4: s = "U";
+							   break; 
 				
 				case 2: s = "L";
-						break;
-				
-				case 3, 4, 5: s = "R";
-						   	  break;
-			}
-					
-		} else if(this.getY() > PacLbl.getY()) {
-			switch(i) {
-				case 0: s = "U";
-						break;
-				
-				case 1, 4, 5: s = "D";
-							  break; 
-				
-				case 2: s = "L";
-						break;
+							break;
 				
 				case 3: s = "R";
-						break;
+							break;
 			}	
 			
-		} else if(this.getX() > PacLbl.getX()) {
+		} else if(GXY[1] < PacLbl.getX()) {
 			switch(i) {
 				case 0: s = "U";
-						break;
+							break;
 				
 				case 1: s = "D";
-						break; 
+							break; 
+							
+				case 2, 3, 4: s = "L";
+						   	   break;
+			}
+					
+		}  else if(GXY[1] > PacLbl.getX()) {
+			switch(i) {
+				case 0: s = "U";
+							break;
 				
-				case 2, 4, 5: s = "L";
-						   	  break;
-						
-				case 3: s = "R";
-						break;
+				case 1: s = "D";
+							break; 
+				
+				case 2, 3, 4: s = "R";
+						   	   break;
+						   	   
 			}
 		}
 		

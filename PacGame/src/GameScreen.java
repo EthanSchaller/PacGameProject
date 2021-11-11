@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.swing.JOptionPane;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -49,7 +50,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	private boolean Hit = false;
 	private boolean dupeChck = false;
 	public int slctIndx, slctIndx2; 
-	public int posMod, posDwnShft, Score;
+	public int posMod, posDwnShft, Score, PltTrkr;
 	public String EECode;
 	
 	//setting up the start button
@@ -274,7 +275,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				posDwnShft += 55;
 				
 				Plt[slctIndx].setX(40 + posMod);
-				
 			}
 	
 			Plt[slctIndx].setY(40 + posDwnShft);
@@ -321,66 +321,11 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	public static void main(String[] args) {
-		//setting up a data base to track submitted scores
-		Connection conn = null;
-		Statement stmt = null;
+		GameScreen Screen = new GameScreen();
+		Screen.setVisible(true);
+	}
 		
-		try {
-			Class.forName("org.sqlite.JDBC");
-			System.out.println("Database Loaded");
-			
-			String dbURL = "JDBC:sqlite:leaderboard.db";
-			conn = DriverManager.getConnection(dbURL);
-			
-			if(conn != null) {
-				System.out.println("Database Connected");
-				conn.setAutoCommit(false);
-				
-				stmt = conn.createStatement();
-				
-				String sql = "CREATE TABLE IF NOT EXISTS PLAYER" + 
-							 "(ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-							 " NAME TEXT NOT NULL," + 
-							 " SCORE INT NOT NULL)";
-				stmt.executeUpdate(sql);
-				conn.commit();
-				System.out.println("Table Created");
-				System.out.println("");
-				
-				System.out.println("    CURRENT LEADERBOARD");
-				ResultSet rs = stmt.executeQuery("SELECT * FROM PLAYER ORDER BY SCORE DESC");
-				DisplayRecords(rs);
-				System.out.println("");
-				
-				GameScreen Screen = new GameScreen();
-				Screen.setVisible(true);
-				
-				rs.close();
-				conn.close();
-			}
-			
-		//checking for errors during the database's activities	
-		} catch(ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch(SQLException e) {
-			e.printStackTrace();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void DisplayRecords(ResultSet rs) throws SQLException{
-		//while loop to print out the inputed scores in the database
-		int id = 1;
-		while(rs.next() && id <= 5) {
-			String name = rs.getString("name");
-			int score = rs.getInt("score");
-			
-			System.out.println(" " + id + ") " + name + "  " + score);
-			id++;
-		}
-	}
-	
+		
 	public void keyTyped(KeyEvent e) {
 		
 	}
@@ -389,8 +334,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		//variables to track pacman's x and y coordinates
 		int PacX = Pac.getX();
 		int PacY = Pac.getY();
-		int PltTrkr = 0;
-		
 		
 		//checking if any ghost is colliding with pacman
 		for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
@@ -401,9 +344,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				}
 				
 				if(!dupeChck) {
-					System.out.println(" You Lose.\r\n Your score is " + Score);
 					dupeChck = true;
-					loseScreen();
+					if(StartBttn.getText() != "You Lose") {
+						loseScreen();
+					}
 				}
 			}
 		}
@@ -416,9 +360,17 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 					PltLbl[slctIndx].setVisible(false);
 					if(Plt[slctIndx].getFilename() == "pPellet.png"){
 						Score += 1500;
+						
+						for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
+							if(Ghost[slctIndx].getEaten() == false) {
+								Ghost[slctIndx].ghVlnrbl();
+							}
+						}
+						
 					} else {
 						Score += 1000;
 					}
+					PltTrkr++;
 				}
 			}
 		}
@@ -475,24 +427,29 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 					
 					Pac.setX(PacX);
 					Pac.setY(PacY);
-					
 				}
 			}
 		
 			//resetting pacman's location based on the updated x and y position
 			PacLbl.setLocation(Pac.getX(), Pac.getY());
 			
-			if(Score >= 246000) {
-				winScreen();
+			if(PltTrkr >= 254) {
+				if(StartBttn.getText() != "You Win") {
+					winScreen();
+				}
+				
+				PltTrkr = 0;
 			}
 		
 		} else if(Hit == true && ExitBttn.isVisible() && !PacLbl.isVisible()) {
 			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
 				Ghost[slctIndx].setMoving(false);
 				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
-				
 			}
-			loseScreen();
+			
+			if(StartBttn.getText() != "You Lose") {
+				loseScreen();
+			}
 		}
 	}
 
@@ -504,7 +461,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				Ghost[slctIndx].setMoving(false);
 				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
 			}
-			loseScreen();
+			if(StartBttn.getText() != "You Lose") {
+				loseScreen();
+			}
 		}
 	}
 
@@ -512,6 +471,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		//testing if the start button was pressed
 		if(e.getSource() == StartBttn) {
 			if(ExitBttn.isVisible()) {
+				lbCreate();
 				StartBttn.setVisible(false);
 				StartBttn.setText("Start");
 				ExtraBttn.setVisible(false);
@@ -554,8 +514,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		} else if(e.getSource() == ExtraBttn) {
 			if(StartBttn.isVisible()) {
 				//setting the current screen state to the code screen
-				codeScreen();
-			
+				if(!ExtraBttn.isVisible() && ExitBttn.getText() != "Enter") {
+					codeScreen();
+				}
 			} else if(!StartBttn.isVisible()) {
 				
 				//collecting the users input and testing it against the desired easter egg code
@@ -566,7 +527,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 					PacR = new ImageIcon(getClass().getResource("PacL.gif"));
 					PacL = new ImageIcon(getClass().getResource("PacR.gif"));
 					
-					System.out.println("Code " + EECode.toUpperCase() + " was applied \r\nPacman is now moonwalking whereever he goes");
+					JOptionPane.showMessageDialog(null, "Code " + EECode.toUpperCase() + " was applied \r\nPacman is now moonwalking whereever he goes");
 				
 				} else {
 					//testing if nothing or something that doesn't match a code is entered and reseting animations to normal
@@ -577,10 +538,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 						PacL = new ImageIcon(getClass().getResource("PacL.gif"));
 						
 						for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
-							Ghost[slctIndx].resetPics();
+							Ghost[slctIndx].setPics();
 						}
 						
-						System.out.println("No code was entered, resetting to game default");
+						JOptionPane.showMessageDialog(null,"No code was entered, resetting to game default");
 						
 					} else {
 						PacU = new ImageIcon(getClass().getResource("PacU.gif"));
@@ -592,7 +553,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 							Ghost[slctIndx].eePics(slctIndx, "GhostR.gif", "GhostB.gif", "GhostP.gif", "GhostO.gif");
 						}
 						
-						System.out.println("Invalid code was entered, resetting to game default");
+						JOptionPane.showMessageDialog(null,"Invalid code was entered, resetting to game default");
 					}
 				}
 				
@@ -603,7 +564,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			
 			//exiting the program if on the main menu
 			if(StartBttn.isVisible()) {
-				System.out.println("\r\nThank you for playing");
+				JOptionPane.showMessageDialog(null, "Thank you for playing my game");
 				System.exit(0);
 			} else if(!StartBttn.isVisible()) {
 				
@@ -632,11 +593,11 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			
 			for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
 				WallLbl[slctIndx].setVisible(false);
-			} 
-			
+			}
 		} else if(!StartBttn.isVisible()) {
 			PgContent.setBackground(Color.BLACK);
 			PacLbl.setVisible(true);
+			PltTrkr = 0;
 			
 			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
 				GhostLbl[slctIndx].setVisible(true);
@@ -651,6 +612,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				WallLbl[slctIndx].setVisible(true);
 			} 
 		}
+		
 	}
 	
 	public void codeScreen() {
@@ -667,9 +629,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			ExtraBttn.setText("Extras");
 			CodeInpt.setVisible(false);
 			CodeInpt.setFocusable(false);
-			
 		}
-		
 	}
 	
 	public void  loseScreen() {
@@ -679,12 +639,141 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		PacLbl.setVisible(true);
 		Pac.setX((GameProps.SCREEN_WIDTH - Pac.getWidth())/2);
 		Pac.setY((GameProps.SCREEN_HEIGHT - Pac.getHeight())/2);
+		
+		//creating and displaying the databases data
+		lbCreate();
+		
+		//telling the user that they lost and what their score is. The user is to enter a 6 letter name to enter the score under
+		String nameIn = JOptionPane.showInputDialog(null, "   You lose, your score was " + Score + ".\r\n   Please enter a name(6 letters)");
+		
+		//if the name is not 6 letters long then asking the user to re-input a name
+		if(nameIn.length() != 6) {
+			nameIn = "";
+			nameIn = JOptionPane.showInputDialog(null, "    Invalid name was entered.\r\n   Please enter a name(6 letters)");
+		
+		//if the name is 6 letters long then it is sent to be added to the database
+		} else {
+			lbAdd(nameIn, Score);
+		}
 	}
 	
 	public void  winScreen() {
 		StartBttn.setVisible(true);
 		StartBttn.setText("You Win");
 		startScreen();
+		
+		lbCreate();
+		
+		//telling the user that they won and what their score is. The user is to enter a 6 letter name to enter the score under
+		String nameIn = JOptionPane.showInputDialog(null, "   You Win!!! Your score was " + Score + ".\r\n    Please enter a name(6 letters)");
+		
+		//if the name is not 6 letters long then asking the user to re-input a name
+		if(nameIn.length() != 6) {
+			nameIn = "";
+			nameIn = JOptionPane.showInputDialog(null, "    Invalid name was entered.\r\n Please enter a new name(6 letters)");
+		
+		//if the name is 6 letters long then it is sent to be added to the database
+		} else {
+			lbAdd(nameIn, Score);
+		}
+		
+		startScreen();
+	}
+	
+	public void lbCreate() {
+		//setting variables to be used for the database connection
+		Connection conn = null;
+		Statement stmt = null;
+		
+		//trying to open and connect to the leaderboard database
+		try {
+			Class.forName("org.sqlite.JDBC");
+			String dbURL = "jdbc:sqlite:leaderboard.db";
+			conn = DriverManager.getConnection(dbURL);
+			
+			//if the connection worked making the database if it isnt made already
+			if (conn != null) {
+				conn.setAutoCommit(false);
+				stmt = conn.createStatement();
+				
+				String sql = "CREATE TABLE IF NOT EXISTS PLAYER " +
+				             "(ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+						     " NAME TEXT NOT NULL, " + 
+				             " SCORE INT NOT NULL)";
+				stmt.executeUpdate(sql);
+				conn.commit();
+				
+				//sorting the data in the leaderboards and displaying the top 5 scores
+				ResultSet rs = stmt.executeQuery("SELECT * FROM PLAYER ORDER BY SCORE DESC LIMIT 5");
+				DisplayRecords(rs);
+				rs.close();
+				
+				//closing the connection
+				conn.close();
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void DisplayRecords(ResultSet rs) throws SQLException{
+		//setting up variables to be used throught the display function
+		int id = 0;
+		String FullString = "";
+		
+		//using the FullString variable to add all data to one string so that it can all be displayed in one dialog box
+		FullString += "          LeaderBoard\r\n===================";
+		
+		//looping through the five entries
+		while (rs.next()) {
+			//upping the ID so that it can be displayed with each entry
+			id++;
+			String name = rs.getString("name");
+			int score = rs.getInt("score");
+			
+			//adding the entry to the FullString variable
+			FullString += "\r\n  " + id + ") " + name + " - " + score;
+		}
+		
+		//displaying all the information with the FullString
+		JOptionPane.showMessageDialog(null, FullString);
+	}
+	
+	public void lbAdd(String name, int score) {
+		//setting variables to be used for the database connection
+		Connection conn = null;
+		Statement stmt = null;
+		
+		//trying to connect to the database
+		try {
+			Class.forName("org.sqlite.JDBC");
+			String dbURL = "jdbc:sqlite:leaderboard.db";
+			conn = DriverManager.getConnection(dbURL);
+			
+			//if the connection is good then it takes the input for the name and score then adds the data to the database
+			if (conn != null) {
+				conn.setAutoCommit(false);
+				
+				stmt = conn.createStatement();
+				String sql = "INSERT INTO PLAYER (NAME, SCORE) VALUES " + 
+				                          "('" + name + "', " + score + ")";
+				stmt.executeUpdate(sql);
+				conn.commit();
+				
+				//closing the connection
+				conn.close();
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
 

@@ -19,6 +19,9 @@ public class Pellets extends Sprite{
 		if(this.rect.intersects(Pac.getRect())) {
 			got = true;
 			this.setVisible(false);
+			if(this.getFilename() == "pPellet.png") {
+				Pac.powerPac = true;
+			}
 		} else {
 			got = false;
 		}
