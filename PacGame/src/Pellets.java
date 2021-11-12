@@ -21,6 +21,7 @@ public class Pellets extends Sprite{
 			this.setVisible(false);
 			if(this.getFilename() == "pPellet.png") {
 				Pac.powerPac = true;
+				Pac.addTime = true;
 			}
 		} else {
 			got = false;

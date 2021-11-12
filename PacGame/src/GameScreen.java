@@ -346,7 +346,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				if(!dupeChck) {
 					dupeChck = true;
 					if(StartBttn.getText() != "You Lose") {
-						loseScreen();
+						try {
+							loseScreen();
+						} catch (SQLException e1) {
+						}
 					}
 				}
 			}
@@ -366,7 +369,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 								Ghost[slctIndx].ghVlnrbl();
 							}
 						}
-						
 					} else {
 						Score += 1000;
 					}
@@ -433,9 +435,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			//resetting pacman's location based on the updated x and y position
 			PacLbl.setLocation(Pac.getX(), Pac.getY());
 			
-			if(PltTrkr >= 254) {
+			if(PltTrkr >= 250) {
 				if(StartBttn.getText() != "You Win") {
-					winScreen();
+					try {winScreen();} catch (SQLException e1) {}
 				}
 				
 				PltTrkr = 0;
@@ -448,7 +450,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			}
 			
 			if(StartBttn.getText() != "You Lose") {
-				loseScreen();
+				try {loseScreen();} catch (SQLException e1) {}
 			}
 		}
 	}
@@ -456,13 +458,13 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	public void keyReleased(KeyEvent e) {
 		
 		//testing again if the user is colliding with a ghost
-		if(Hit == true) {
+		if(Hit == true && ExitBttn.isVisible() && !PacLbl.isVisible()) {
 			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
 				Ghost[slctIndx].setMoving(false);
 				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
 			}
 			if(StartBttn.getText() != "You Lose") {
-				loseScreen();
+				try {loseScreen();} catch (SQLException e1) {}
 			}
 		}
 	}
@@ -632,7 +634,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		}
 	}
 	
-	public void  loseScreen() {
+	public void  loseScreen() throws SQLException {
 		StartBttn.setVisible(true);
 		StartBttn.setText("You Lose");
 		startScreen();
@@ -641,15 +643,19 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		Pac.setY((GameProps.SCREEN_HEIGHT - Pac.getHeight())/2);
 		
 		//creating and displaying the databases data
-		lbCreate();
+		ResultSet rs = lbCreate();
+		String Disp = DisplayRecords(rs);
+		Disp += "You lose, your score was " + Score + ".\r\nPlease enter a name(6 letters)";
 		
 		//telling the user that they lost and what their score is. The user is to enter a 6 letter name to enter the score under
-		String nameIn = JOptionPane.showInputDialog(null, "   You lose, your score was " + Score + ".\r\n   Please enter a name(6 letters)");
+		String nameIn = JOptionPane.showInputDialog(null, Disp);
 		
+		Disp = DisplayRecords(rs);
+		Disp += " Invalid name was entered.\r\nPlease enter a name(6 letters)";
 		//if the name is not 6 letters long then asking the user to re-input a name
 		if(nameIn.length() != 6) {
 			nameIn = "";
-			nameIn = JOptionPane.showInputDialog(null, "    Invalid name was entered.\r\n   Please enter a name(6 letters)");
+			nameIn = JOptionPane.showInputDialog(null, Disp);
 		
 		//if the name is 6 letters long then it is sent to be added to the database
 		} else {
@@ -657,33 +663,38 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		}
 	}
 	
-	public void  winScreen() {
+	public void  winScreen() throws SQLException {
 		StartBttn.setVisible(true);
 		StartBttn.setText("You Win");
 		startScreen();
 		
-		lbCreate();
+		//creating and displaying the databases data
+		ResultSet rs = lbCreate();
+		String Disp = DisplayRecords(rs);
+		Disp += "You Win!!! Your score was " + Score + ".\r\n Please enter a name(6 letters)";
 		
-		//telling the user that they won and what their score is. The user is to enter a 6 letter name to enter the score under
-		String nameIn = JOptionPane.showInputDialog(null, "   You Win!!! Your score was " + Score + ".\r\n    Please enter a name(6 letters)");
+		//telling the user that they lost and what their score is. The user is to enter a 6 letter name to enter the score under
+		String nameIn = JOptionPane.showInputDialog(null, Disp);
 		
+		Disp = DisplayRecords(rs);
+		Disp += "   Invalid name was entered.\r\nPlease enter a new name(6 letters)";
 		//if the name is not 6 letters long then asking the user to re-input a name
-		if(nameIn.length() != 6) {
+		while(nameIn.length() != 6) {
 			nameIn = "";
-			nameIn = JOptionPane.showInputDialog(null, "    Invalid name was entered.\r\n Please enter a new name(6 letters)");
+			nameIn = JOptionPane.showInputDialog(null, Disp);
+		}
 		
 		//if the name is 6 letters long then it is sent to be added to the database
-		} else {
-			lbAdd(nameIn, Score);
-		}
+		lbAdd(nameIn, Score);
 		
 		startScreen();
 	}
-	
-	public void lbCreate() {
+
+	public ResultSet lbCreate() {
 		//setting variables to be used for the database connection
 		Connection conn = null;
 		Statement stmt = null;
+		ResultSet rs = null;
 		
 		//trying to open and connect to the leaderboard database
 		try {
@@ -704,8 +715,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				conn.commit();
 				
 				//sorting the data in the leaderboards and displaying the top 5 scores
-				ResultSet rs = stmt.executeQuery("SELECT * FROM PLAYER ORDER BY SCORE DESC LIMIT 5");
-				DisplayRecords(rs);
+				rs = stmt.executeQuery("SELECT * FROM PLAYER ORDER BY SCORE DESC LIMIT 5");
 				rs.close();
 				
 				//closing the connection
@@ -718,15 +728,17 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		return rs;
 	}
 	
-	public static void DisplayRecords(ResultSet rs) throws SQLException{
-		//setting up variables to be used throught the display function
+	public static String DisplayRecords(ResultSet rs) throws SQLException{
+		//setting up variables to be used throughout the display function
 		int id = 0;
 		String FullString = "";
 		
 		//using the FullString variable to add all data to one string so that it can all be displayed in one dialog box
-		FullString += "          LeaderBoard\r\n===================";
+		FullString += "          LeaderBoard\r\n===================\r\n";
 		
 		//looping through the five entries
 		while (rs.next()) {
@@ -736,11 +748,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			int score = rs.getInt("score");
 			
 			//adding the entry to the FullString variable
-			FullString += "\r\n  " + id + ") " + name + " - " + score;
+			FullString += "  " + id + ") " + name + " - " + score +"\r\n";
 		}
 		
-		//displaying all the information with the FullString
-		JOptionPane.showMessageDialog(null, FullString);
+		return FullString;
 	}
 	
 	public void lbAdd(String name, int score) {

@@ -19,7 +19,7 @@ public class Ghosts extends Sprite implements Runnable{
 	String[] mvDir = new String[4];
 	boolean Vul = false;
 	boolean Eaten = false;
-	int eatTimer = 0;
+	int eatTimer = 1000;
 	
 	//setting up getters
 	public Boolean getVisible() {return Vis;}
@@ -226,36 +226,18 @@ public class Ghosts extends Sprite implements Runnable{
 	}
 	
 	public int[] eatMv(int[] GXY) {
-		String mv = "";
 		
-		//moving the ghosts to the center of the screen(somewhat, but kind of weird)
-		if(GXY[1] > GameProps.SCREEN_HEIGHT/2) {
-			GXY[1] -= GameProps.GHST_STEP;
-			mv = "U";
-		} else if(GXY[1] < GameProps.SCREEN_HEIGHT/2) {
-			GXY[1] += GameProps.GHST_STEP;
-			mv = "D";
+		//moving the ghosts to the center of the screen(somewhat, but kind of janky)
+		if(GXY[1] > (GameProps.SCREEN_WIDTH - this.getWidth())/2) {
+			GXY[1] -= GameProps.GHST_STEP * 2;
+		} else if(GXY[1] < (GameProps.SCREEN_WIDTH - this.getWidth())/2) {
+			GXY[1] += GameProps.GHST_STEP * 2;
 		}
 		
-		if(GXY[2] > GameProps.SCREEN_WIDTH/2) {
-			GXY[2] -= GameProps.GHST_STEP;
-			mv = "L";
-		} else if(GXY[2] < GameProps.SCREEN_WIDTH/2) {
-			GXY[2] += GameProps.GHST_STEP;
-			mv = "R";
-		}
-		
-		//only put wall interactions with the middle wall
-		if(this.getRect().intersects(Wall[13].getRect())) {
-			if(mv == "U") {
-				GXY[2] += GameProps.GHST_STEP * 2;
-			} else if(mv == "D") {
-				GXY[2] -= GameProps.GHST_STEP * 2;
-			} else if(mv == "L") {
-				GXY[1] += GameProps.GHST_STEP * 2;
-			} else if(mv == "R") {
-				GXY[1] -= GameProps.GHST_STEP * 2;
-			}
+		if(GXY[2] > GameProps.SCREEN_HEIGHT/2 - 222) {
+			GXY[2] -= GameProps.GHST_STEP * 2;
+		} else if(GXY[2] < GameProps.SCREEN_HEIGHT/2 - 222) {
+			GXY[2] += GameProps.GHST_STEP * 2;
 		}
 		
 		return GXY;
@@ -272,6 +254,8 @@ public class Ghosts extends Sprite implements Runnable{
 		mvDir[3] = "R";
 		int intrnlTimer = 100;
 		int pPelTimer = 2000;
+		eatTimer = 1000;
+		Eaten = false;
 		
 		//looping until the a collision happens and the ghosts stop moving
 		while(Move) {
@@ -285,8 +269,72 @@ public class Ghosts extends Sprite implements Runnable{
 			PacXY[1] = Pac.getX();
 			PacXY[2] = Pac.getY();
 			
+			if(Vul) {
+				ghVlnrbl();
+			}
+			
+			if(Pac.addTime) {
+				pPelTimer += 2000;
+				Pac.addTime = false;
+				if(!Eaten) {
+					Vul = true;
+				}
+			}
+			
+			//checking if pacman eat a power pellet recently or not
+			if(Pac.powerPac) {
+				//if the pPellet timer is lower than 0 then the timer is set back to 2000, the powerPac variable is set to false, and the Vulnerable variable is set to false
+				if(pPelTimer < 0) {
+					pPelTimer = 2000;
+					Pac.powerPac = false;
+					Vul = false;
+				//if the pPellet timer is above 0 then it is lowered by 1
+				} else {
+					pPelTimer--;
+				}
+			
+			//if the ghost is not eaten and the powerPac variable is false, the ghosts are set to their original gifs
+			} else if(!Eaten) {
+				switch(GhNum) {
+					case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
+							break;
+					case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostB.gif")));
+							break;
+					case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostP.gif")));
+							break;
+					case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostO.gif")));
+							break;
+					default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
+							 break;
+				}
+			}
+			
+			//if the ghost is eaten loop through this code
+			if(Eaten) {
+				//testing if the timer ran out
+				if(eatTimer < 0) {
+					//if the timer ran out then change the ghosts Eaten variable to false and change the images back to their default
+					Eaten = false;
+					eatTimer = 1000;
+					switch(GhNum) {
+						case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
+								break;
+						case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostB.gif")));
+								break;
+						case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostP.gif")));
+								break;
+						case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostO.gif")));
+								break;
+						default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
+								 break;
+					}
+				} else {
+					eatTimer--;
+				}
+			}
+			
 			//changing the movement type for the normal pattern if it is eaten or not
-			if(Eaten == false) {
+			if(!Eaten) {
 				switch(GhNum) {
 					case 1: GhostXY = nrmMv(GhostXY, mvDir[GhNum], intrnlTimer);
 							try {
@@ -346,59 +394,6 @@ public class Ghosts extends Sprite implements Runnable{
 			//re-setting the ghost's location based on the x and y positions
 			GhostLbl.setLocation(this.x, this.y);
 			
-			//checking if pacman eat a power pellet recently or not
-			if(Pac.powerPac == true) {
-				//if the pPellet timer is 0 or lower than the timer is set back to 2000, the powerPac variable is set to false, and the Vulnerable variable is set to false
-				if(pPelTimer <= 0) {
-					pPelTimer = 2000;
-					Pac.powerPac = false;
-					Vul = false;
-				
-				//if the pPellet timer is above 0 then it is lowered by 1
-				} else {
-					pPelTimer--;
-				}
-			
-			//if the ghost is not eaten and the powerPac variable is false, the ghosts are set to their original gifs
-			} else if(Eaten == false) {
-				switch(GhNum) {
-					case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
-							break;
-					case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostB.gif")));
-							break;
-					case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostP.gif")));
-							break;
-					case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostO.gif")));
-							break;
-					default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
-							 break;
-				}
-			}
-			
-			//if the ghost is eaten loop through this code
-			if(Eaten == true) {
-				//testing if the timer ran out
-				if(eatTimer <= 0) {
-					//if the timer ran out then change the ghosts Eaten variable to false and change the images back to their default
-					Eaten = false;
-					switch(GhNum) {
-						case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
-								break;
-						case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostB.gif")));
-								break;
-						case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostP.gif")));
-								break;
-						case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostO.gif")));
-								break;
-						default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
-								 break;
-					}
-					
-				//if the timer isn't 0 reduce it by one
-				} else {
-					eatTimer--;
-				}
-			}
 			//check for player collision
 			this.plyrCollision();
 		}
@@ -428,12 +423,11 @@ public class Ghosts extends Sprite implements Runnable{
 				temp = true;
 			
 			//if the ghost is vulnerable run this code
-			} else if(Vul == true) {
+			} else if(Vul) {
 				//set the ghosts image to that of its eaten form
 				GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostEat.png")));
 				
-				//reset the eaten timer, set the Ghost to Eaten and not Vulnerable
-				eatTimer = 1000;
+				//set the Ghost to Eaten and not Vulnerable
 				Eaten = true;
 				Vul = false;
 			} 
