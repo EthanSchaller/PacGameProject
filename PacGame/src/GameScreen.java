@@ -46,6 +46,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	private JLabel[] WallLbl = new JLabel[14];
 	private ImageIcon[] WallImg = new ImageIcon[14];
 	
+	//adding a jlabel that can be set to what ever background that is needed
+	private JLabel bgAll;
+	private ImageIcon bgImg;
+	
 	//setting up various variables to be used throughout the program
 	private boolean Hit = false;
 	private boolean dupeChck = false;
@@ -65,7 +69,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	public GameScreen() {
 		super("Pac-Man");
 		setSize(GameProps.SCREEN_WIDTH, GameProps.SCREEN_HEIGHT);
-		
+	
 		//setting the start button's starting position and adding it to the page
 		StartBttn = new JButton("Start");
 		StartBttn.setSize(100, 50);
@@ -96,7 +100,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		CodeInpt.setLocation((GameProps.SCREEN_WIDTH - StartBttn.getWidth())/2, ((GameProps.SCREEN_HEIGHT - StartBttn.getHeight())/2) - 75);
 		add(CodeInpt);
 		CodeInpt.setVisible(false);
-				
 		
 		//inputting pacman's data into the program
 		PacLbl = new JLabel();
@@ -191,7 +194,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		
 		//loading the pages content and setting the background to black
 		PgContent = getContentPane();
-		PgContent.setBackground(Color.BLACK);
 		
 		setLayout(null);
 		
@@ -296,7 +298,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			
 			posMod += 40;
 		}
-		
 				
 		//setting up the variables in the ghost's data that is set in the Ghosts java file
 		for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
@@ -312,6 +313,15 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			Plt[slctIndx].setPac(Pac);
 		}
 		
+		//setting up the bgAll jLabel
+		bgAll = new JLabel();
+		bgAll.setSize(995, 1020);
+		bgAll.setLocation(-10, 0);
+		add(bgAll);
+		bgAll.setFocusable(false);
+		bgImg = new ImageIcon(getClass().getResource("TitleScreen.png"));
+		bgAll.setIcon(bgImg);		
+
 		startScreen();
 		
 		//setting a listener to the page and setting it to not be focusable
@@ -346,10 +356,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				if(!dupeChck) {
 					dupeChck = true;
 					if(StartBttn.getText() != "You Lose") {
-						try {
-							loseScreen();
-						} catch (SQLException e1) {
-						}
+						bgImg = new ImageIcon(getClass().getResource("LoseScreen.png"));
+						bgAll.setIcon(bgImg);
+						
+						try {loseScreen();} catch (SQLException e1) {}
 					}
 				}
 			}
@@ -437,6 +447,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			
 			if(PltTrkr >= 250) {
 				if(StartBttn.getText() != "You Win") {
+					bgImg = new ImageIcon(getClass().getResource("WinScreen.png"));
+					bgAll.setIcon(bgImg);
+					
 					try {winScreen();} catch (SQLException e1) {}
 				}
 				
@@ -450,6 +463,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			}
 			
 			if(StartBttn.getText() != "You Lose") {
+				bgImg = new ImageIcon(getClass().getResource("LoseScreen.png"));
+				bgAll.setIcon(bgImg);
+				
 				try {loseScreen();} catch (SQLException e1) {}
 			}
 		}
@@ -464,6 +480,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
 			}
 			if(StartBttn.getText() != "You Lose") {
+				bgImg = new ImageIcon(getClass().getResource("LoseScreen.png"));
+				bgAll.setIcon(bgImg);
+				
 				try {loseScreen();} catch (SQLException e1) {}
 			}
 		}
@@ -473,6 +492,8 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		//testing if the start button was pressed
 		if(e.getSource() == StartBttn) {
 			if(ExitBttn.isVisible()) {
+				bgImg = new ImageIcon(getClass().getResource("BlankScreen.png"));
+				bgAll.setIcon(bgImg);
 				lbCreate();
 				StartBttn.setVisible(false);
 				StartBttn.setText("Start");
@@ -507,6 +528,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 					PltLbl[slctIndx].setVisible(true);
 				}
 			} else if(!ExitBttn.isVisible()) {
+				bgImg = new ImageIcon(getClass().getResource("TitleScreen.png"));
+				bgAll.setIcon(bgImg);
+				
 				StartBttn.setVisible(true);
 				ExtraBttn.setVisible(true);
 				ExitBttn.setVisible(true);
@@ -514,13 +538,15 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			}
 			
 		} else if(e.getSource() == ExtraBttn) {
+			bgImg = new ImageIcon(getClass().getResource("BlankScreen.png"));
+			bgAll.setIcon(bgImg);
+			
 			if(StartBttn.isVisible()) {
 				//setting the current screen state to the code screen
 				if(!ExtraBttn.isVisible() && ExitBttn.getText() != "Enter") {
 					codeScreen();
 				}
 			} else if(!StartBttn.isVisible()) {
-				
 				//collecting the users input and testing it against the desired easter egg code
 				EECode = CodeInpt.getText();
 				if(EECode.equalsIgnoreCase("Billie")) {
@@ -563,10 +589,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			}
 			
 		} else if(e.getSource() == ExitBttn) {
-			
 			//exiting the program if on the main menu
 			if(StartBttn.isVisible()) {
-				JOptionPane.showMessageDialog(null, "Thank you for playing my game");
+				JOptionPane.showMessageDialog(null, "Thank you for playing my game,\r\n     Hope You had a fun time!!!");
 				System.exit(0);
 			} else if(!StartBttn.isVisible()) {
 				
@@ -577,6 +602,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	public void startScreen() {
+		StartBttn.setLocation((GameProps.SCREEN_WIDTH - StartBttn.getWidth())/2, ((GameProps.SCREEN_HEIGHT - StartBttn.getHeight())/2) - 75);
 		if(StartBttn.isVisible()) {
 			if(ExitBttn.isVisible()) {
 				StartBttn.setText("Start");
@@ -618,6 +644,8 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	public void codeScreen() {
+		bgImg = new ImageIcon(getClass().getResource("BlankScreen.png"));
+		
 		//if the start button is visible it sends the user to the code menu
 		if(StartBttn.isVisible()) {
 			StartBttn.setVisible(false);
@@ -638,9 +666,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		StartBttn.setVisible(true);
 		StartBttn.setText("You Lose");
 		startScreen();
-		PacLbl.setVisible(true);
-		Pac.setX((GameProps.SCREEN_WIDTH - Pac.getWidth())/2);
-		Pac.setY((GameProps.SCREEN_HEIGHT - Pac.getHeight())/2);
 		
 		//creating and displaying the databases data
 		ResultSet rs = lbCreate();
@@ -738,7 +763,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		String FullString = "";
 		
 		//using the FullString variable to add all data to one string so that it can all be displayed in one dialog box
-		FullString += "          LeaderBoard\r\n===================\r\n";
+		FullString += "                  LeaderBoard\r\n==========================\r\n";
 		
 		//looping through the five entries
 		while (rs.next()) {

@@ -288,6 +288,7 @@ public class Ghosts extends Sprite implements Runnable{
 					pPelTimer = 2000;
 					Pac.powerPac = false;
 					Vul = false;
+					
 				//if the pPellet timer is above 0 then it is lowered by 1
 				} else {
 					pPelTimer--;
@@ -311,10 +312,12 @@ public class Ghosts extends Sprite implements Runnable{
 			
 			//if the ghost is eaten loop through this code
 			if(Eaten) {
+				Vul = false;
 				//testing if the timer ran out
 				if(eatTimer < 0) {
 					//if the timer ran out then change the ghosts Eaten variable to false and change the images back to their default
 					Eaten = false;
+					
 					eatTimer = 1000;
 					switch(GhNum) {
 						case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
@@ -416,7 +419,6 @@ public class Ghosts extends Sprite implements Runnable{
 				
 				//pacman is set to its death animation nad set to the center of the screen
 				PacLbl.setIcon(new ImageIcon(getClass().getResource("PacDth.gif")));
-				PacLbl.setLocation((GameProps.SCREEN_WIDTH - Pac.getWidth())/2, (GameProps.SCREEN_HEIGHT - Pac.getHeight())/2);
 				
 				//ghost is hidden and the temp variable is set to true
 				GhostLbl.setVisible(false);
