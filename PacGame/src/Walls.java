@@ -2,7 +2,7 @@ public class Walls extends Sprite {
 	private Boolean Vis;
 	
 	public Walls(String slct) {
-		super(100, 100, "PacWall.png");
+		super(100, 100, "MainFolder/PacWall.png");
 		
 		switch(slct) {
 			case "vrtTall": this.setHeight(1000);

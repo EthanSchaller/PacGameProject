@@ -4,13 +4,13 @@ public class Pellets extends Sprite{
 	private Boolean got;
 	
 	public Pellets() {
-		super(20, 20, "Pellet.png");
+		super(20, 20, "MainFolder/Pellet.png");
 		this.Vis = true;
 		this.dupe = false;
 	}
 	
 	public Pellets(String temp) {
-		super(20, 20, "pPellet.png");
+		super(20, 20, "MainFolder/pPellet.png");
 		this.Vis = true;
 		this.dupe = false;
 	}
@@ -19,7 +19,7 @@ public class Pellets extends Sprite{
 		if(this.rect.intersects(Pac.getRect())) {
 			got = true;
 			this.setVisible(false);
-			if(this.getFilename() == "pPellet.png") {
+			if(this.getFilename() == "MainFolder/pPellet.png") {
 				Pac.powerPac = true;
 				Pac.addTime = true;
 			}

@@ -21,6 +21,16 @@ public class Ghosts extends Sprite implements Runnable{
 	boolean Eaten = false;
 	int eatTimer = 1000;
 	
+	//making the PacMan and Ghosts filenames a variable so that it can be easily changed
+	String PacDth = "MainFolder/PacDth.gif";
+	
+	String GhostR = "MainFolder/GhostR.gif";
+	String GhostB = "MainFolder/GhostB.gif";
+	String GhostP = "MainFolder/GhostP.gif";
+	String GhostO = "MainFolder/GhostO.gif";
+	String GhostV = "MainFolder/GhostV.gif";
+	String GhostEat = "MainFolder/GhostEat.png";
+	
 	//setting up getters
 	public Boolean getVisible() {return Vis;}
 	public Boolean getMove() {return Move;}
@@ -37,27 +47,27 @@ public class Ghosts extends Sprite implements Runnable{
 	
 	//setting default values for the Ghosts class
 	public Ghosts() {
-		super(50, 50, "GhostR.gif");
+		super(50, 50, "MainFolder/GhostR.gif");
 		this.Vis = true;
 		this.Move = false;
 	}
 	
 	//setting up a Ghosts class that allows for a variable to be entered
 	public Ghosts(int i) {
-		super(50, 50, "GhostR.gif");
+		super(50, 50, "MainFolder/GhostR.gif");
 		this.Vis = true;
 		this.Move = false;
 		GhNum = i;
 		
 		//taking the entered variable to set the right ghost's color
 		switch(GhNum) {
-			case 1: this.setFilename("GhostR.gif");
+			case 1: this.setFilename(GhostR);
 					break;
-			case 2: this.setFilename("GhostB.gif");
+			case 2: this.setFilename(GhostB);
 					break;
-			case 3: this.setFilename("GhostP.gif");
+			case 3: this.setFilename(GhostP);
 					break;
-			case 4: this.setFilename("GhostO.gif");
+			case 4: this.setFilename(GhostO);
 					break;
 			default: this.setFilename("");
 					 break;
@@ -83,33 +93,73 @@ public class Ghosts extends Sprite implements Runnable{
 	}
 	
 	//reseting the pictures
-	public void setPics() {
-		GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
-		PacLbl.setIcon(new ImageIcon(getClass().getResource("PacR.gif")));
+	public void resetPics() {
+		GhostR = "MainFolder/GhostR.gif";
+		GhostB = "MainFolder/GhostB.gif";
+		GhostP = "MainFolder/GhostP.gif";
+		GhostO = "MainFolder/GhostO.gif";
+		GhostV = "MainFolder/GhostV.gif";
+		GhostEat = "MainFolder/GhostEat.png";
 	}
 	
-	public void eePics(int i, String a, String b, String c, String d) {
+	public void setVulPic(int i, String a, String b, String c, String d) {
 		switch(i) {
-			case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource(a)));
+			case 1: GhostV = a;
 					break;
-			case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource(b)));
+			case 2: GhostV = b;
 					break;
-			case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource(c)));
+			case 3: GhostV = c;
 					break;
-			case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource(d)));
+			case 4: GhostV = d;
 					break;
-			default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
+			default: GhostV = "MainFolder/GhostV.gif";
 					 break;
 		}
 	}
 	
+	public void setEatPic(int i, String a, String b, String c, String d) {
+		switch(i) {
+		case 1: GhostEat = a;
+				break;
+		case 2: GhostEat = b;
+				break;
+		case 3: GhostEat = c;
+				break;
+		case 4: GhostEat = d;
+				break;
+		default: GhostEat = "MainFolder/GhostEat.gif";
+				 break;
+	}
+	}
+	
+	public void eePics(int i, String a, String b, String c, String d, String e) {
+		switch(i) {
+			case 1: GhostR = a;
+					GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostR)));
+					break;
+			case 2: GhostB = b;
+					GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostB)));
+					break;
+			case 3: GhostP = c;
+					GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostP)));
+					break;
+			case 4: GhostO = d;
+					GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostO)));
+					break;
+			default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
+					 break;
+		}
+		
+		PacDth = e;
+	}
+	
 	public void ghVlnrbl() {
-		GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostV.gif")));
+		GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostV)));
 		Vul = true;
 	}
 	
 	public void ghEaten(int i) {
-		GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostEat.png")));
+		GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostEat)));
 	}
 	
 	public int[] shdwMv(int[] GXY, int[] PXY) {
@@ -247,7 +297,7 @@ public class Ghosts extends Sprite implements Runnable{
 		//starting the movement
 		this.Move = true;
 		
-		setPics();
+		eePics(GhNum, GhostR, GhostB, GhostP, GhostO, PacDth);
 		
 		mvDir[1] = "U";
 		mvDir[2] = "L";
@@ -274,7 +324,7 @@ public class Ghosts extends Sprite implements Runnable{
 			}
 			
 			if(Pac.addTime) {
-				pPelTimer += 2000;
+				pPelTimer = 2000;
 				Pac.addTime = false;
 				if(!Eaten) {
 					Vul = true;
@@ -297,13 +347,13 @@ public class Ghosts extends Sprite implements Runnable{
 			//if the ghost is not eaten and the powerPac variable is false, the ghosts are set to their original gifs
 			} else if(!Eaten) {
 				switch(GhNum) {
-					case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
+					case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostR)));
 							break;
-					case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostB.gif")));
+					case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostB)));
 							break;
-					case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostP.gif")));
+					case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostP)));
 							break;
-					case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostO.gif")));
+					case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostO)));
 							break;
 					default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
 							 break;
@@ -320,13 +370,13 @@ public class Ghosts extends Sprite implements Runnable{
 					
 					eatTimer = 1000;
 					switch(GhNum) {
-						case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostR.gif")));
+						case 1: GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostR)));
 								break;
-						case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostB.gif")));
+						case 2: GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostB)));
 								break;
-						case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostP.gif")));
+						case 3: GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostP)));
 								break;
-						case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostO.gif")));
+						case 4: GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostO)));
 								break;
 						default: GhostLbl.setIcon(new ImageIcon(getClass().getResource(getFilename())));
 								 break;
@@ -418,7 +468,7 @@ public class Ghosts extends Sprite implements Runnable{
 				StartBttn.setText("Start");
 				
 				//pacman is set to its death animation nad set to the center of the screen
-				PacLbl.setIcon(new ImageIcon(getClass().getResource("PacDth.gif")));
+				PacLbl.setIcon(new ImageIcon(getClass().getResource(PacDth)));
 				
 				//ghost is hidden and the temp variable is set to true
 				GhostLbl.setVisible(false);
@@ -427,7 +477,7 @@ public class Ghosts extends Sprite implements Runnable{
 			//if the ghost is vulnerable run this code
 			} else if(Vul) {
 				//set the ghosts image to that of its eaten form
-				GhostLbl.setIcon(new ImageIcon(getClass().getResource("GhostEat.png")));
+				GhostLbl.setIcon(new ImageIcon(getClass().getResource(GhostEat)));
 				
 				//set the Ghost to Eaten and not Vulnerable
 				Eaten = true;

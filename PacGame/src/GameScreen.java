@@ -26,10 +26,16 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	private ImageIcon PacImg;
 	
 	//allowing for easier switching of pacman's animations(in the form of gifs)
-	private ImageIcon PacU = new ImageIcon(getClass().getResource("PacU.gif"));
-	private ImageIcon PacD = new ImageIcon(getClass().getResource("PacD.gif"));
-	private ImageIcon PacR = new ImageIcon(getClass().getResource("PacR.gif"));
-	private ImageIcon PacL = new ImageIcon(getClass().getResource("PacL.gif"));
+	private ImageIcon PacU = new ImageIcon(getClass().getResource("MainFolder/PacU.gif"));
+	private ImageIcon PacD = new ImageIcon(getClass().getResource("MainFolder/PacD.gif"));
+	private ImageIcon PacR = new ImageIcon(getClass().getResource("MainFolder/PacR.gif"));
+	private ImageIcon PacL = new ImageIcon(getClass().getResource("MainFolder/PacL.gif"));
+	
+	//allowing for easier switching of Screens(Title, Win, Loss, Blank)
+	private ImageIcon TtlScrn = new ImageIcon(getClass().getResource("MainFolder/TitleScreen.png"));
+	private ImageIcon WnScrn = new ImageIcon(getClass().getResource("MainFolder/WinScreen.png"));
+	private ImageIcon LsScrn = new ImageIcon(getClass().getResource("MainFolder/LoseScreen.png"));
+	private ImageIcon BlnkScrn = new ImageIcon(getClass().getResource("MainFolder/BlankScreen.png"));
 	
 	//setting up variable to store the pellets' info
 	private Pellets[] Plt = new Pellets[392];
@@ -123,7 +129,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			if(slctIndx == 1 || slctIndx == 23 || slctIndx == 369 || slctIndx == 391) {
 				PltLbl[slctIndx] = new JLabel();
 				Plt[slctIndx] = new Pellets("Power");
-				PltImg[slctIndx] = new ImageIcon(getClass().getResource(Plt[slctIndx].getFilename())) ;
+				PltImg[slctIndx] = new ImageIcon(getClass().getResource("MainFolder/pPellet.png")) ;
 				PltLbl[slctIndx].setIcon(PltImg[slctIndx]);
 				PltLbl[slctIndx].setSize(Plt[slctIndx].getWidth(), Plt[slctIndx].getHeight());
 			
@@ -131,7 +137,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			} else {
 				PltLbl[slctIndx] = new JLabel();
 				Plt[slctIndx] = new Pellets();
-				PltImg[slctIndx] = new ImageIcon(getClass().getResource(Plt[slctIndx].getFilename())) ;
+				PltImg[slctIndx] = new ImageIcon(getClass().getResource("MainFolder/Pellet.png")) ;
 				PltLbl[slctIndx].setIcon(PltImg[slctIndx]);
 				PltLbl[slctIndx].setSize(Plt[slctIndx].getWidth(), Plt[slctIndx].getHeight());
 			}
@@ -319,7 +325,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		bgAll.setLocation(-10, 0);
 		add(bgAll);
 		bgAll.setFocusable(false);
-		bgImg = new ImageIcon(getClass().getResource("TitleScreen.png"));
+		bgImg = TtlScrn;
 		bgAll.setIcon(bgImg);		
 
 		startScreen();
@@ -356,8 +362,9 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				if(!dupeChck) {
 					dupeChck = true;
 					if(StartBttn.getText() != "You Lose") {
-						bgImg = new ImageIcon(getClass().getResource("LoseScreen.png"));
+						bgImg = LsScrn;
 						bgAll.setIcon(bgImg);
+						Hit = false;
 						
 						try {loseScreen();} catch (SQLException e1) {}
 					}
@@ -371,9 +378,8 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				if(Plt[slctIndx].collected()) {
 					Plt[slctIndx].setDupe(true);
 					PltLbl[slctIndx].setVisible(false);
-					if(Plt[slctIndx].getFilename() == "pPellet.png"){
+					if(Plt[slctIndx].getFilename() == "MainFolder/pPellet.png" || Plt[slctIndx].getFilename() == "EEfolder/pPelletBark.png"){
 						Score += 1500;
-						
 						for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
 							if(Ghost[slctIndx].getEaten() == false) {
 								Ghost[slctIndx].ghVlnrbl();
@@ -382,6 +388,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 					} else {
 						Score += 1000;
 					}
+					
 					PltTrkr++;
 				}
 			}
@@ -447,7 +454,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			
 			if(PltTrkr >= 250) {
 				if(StartBttn.getText() != "You Win") {
-					bgImg = new ImageIcon(getClass().getResource("WinScreen.png"));
+					bgImg = WnScrn;
 					bgAll.setIcon(bgImg);
 					
 					try {winScreen();} catch (SQLException e1) {}
@@ -455,44 +462,20 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				
 				PltTrkr = 0;
 			}
-		
-		} else if(Hit == true && ExitBttn.isVisible() && !PacLbl.isVisible()) {
-			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
-				Ghost[slctIndx].setMoving(false);
-				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
-			}
-			
-			if(StartBttn.getText() != "You Lose") {
-				bgImg = new ImageIcon(getClass().getResource("LoseScreen.png"));
-				bgAll.setIcon(bgImg);
-				
-				try {loseScreen();} catch (SQLException e1) {}
-			}
 		}
+		
+		
 	}
 
 	public void keyReleased(KeyEvent e) {
 		
-		//testing again if the user is colliding with a ghost
-		if(Hit == true && ExitBttn.isVisible() && !PacLbl.isVisible()) {
-			for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
-				Ghost[slctIndx].setMoving(false);
-				GhostLbl[slctIndx].setIcon(new ImageIcon(getClass().getResource("")));
-			}
-			if(StartBttn.getText() != "You Lose") {
-				bgImg = new ImageIcon(getClass().getResource("LoseScreen.png"));
-				bgAll.setIcon(bgImg);
-				
-				try {loseScreen();} catch (SQLException e1) {}
-			}
-		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		//testing if the start button was pressed
 		if(e.getSource() == StartBttn) {
 			if(ExitBttn.isVisible()) {
-				bgImg = new ImageIcon(getClass().getResource("BlankScreen.png"));
+				bgImg = BlnkScrn;
 				bgAll.setIcon(bgImg);
 				lbCreate();
 				StartBttn.setVisible(false);
@@ -506,7 +489,13 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				Score = 0;
 				Hit = false;
 				
+				for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
+					Ghost[slctIndx].Vul = false;
+					Ghost[slctIndx].Eaten = false;
+				}
+				
 				//resetting the location of pacman at the start of the game
+				PacLbl.setIcon(PacR);
 				Pac.setX((GameProps.SCREEN_WIDTH-Pac.getWidth())/2);
 				Pac.setY(25);
 				PacLbl.setLocation(Pac.getX(), Pac.getY());
@@ -518,7 +507,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 					Ghost[slctIndx].setX(50 + posMod);
 					Ghost[slctIndx].setY(900);
 					GhostLbl[slctIndx].setLocation(Ghost[slctIndx].getX(), Ghost[slctIndx].getY());
-					
 					posMod += 283;
 				}
 				
@@ -528,7 +516,7 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 					PltLbl[slctIndx].setVisible(true);
 				}
 			} else if(!ExitBttn.isVisible()) {
-				bgImg = new ImageIcon(getClass().getResource("TitleScreen.png"));
+				bgImg = TtlScrn;
 				bgAll.setIcon(bgImg);
 				
 				StartBttn.setVisible(true);
@@ -538,49 +526,120 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			}
 			
 		} else if(e.getSource() == ExtraBttn) {
-			bgImg = new ImageIcon(getClass().getResource("BlankScreen.png"));
-			bgAll.setIcon(bgImg);
-			
 			if(StartBttn.isVisible()) {
 				//setting the current screen state to the code screen
-				if(!ExtraBttn.isVisible() && ExitBttn.getText() != "Enter") {
+				if(ExtraBttn.isVisible()) {
 					codeScreen();
 				}
 			} else if(!StartBttn.isVisible()) {
 				//collecting the users input and testing it against the desired easter egg code
 				EECode = CodeInpt.getText();
 				if(EECode.equalsIgnoreCase("Billie")) {
-					PacU = new ImageIcon(getClass().getResource("PacD.gif"));
-					PacD = new ImageIcon(getClass().getResource("PacU.gif"));
-					PacR = new ImageIcon(getClass().getResource("PacL.gif"));
-					PacL = new ImageIcon(getClass().getResource("PacR.gif"));
+					PacU = new ImageIcon(getClass().getResource("MainFolder/PacD.gif"));
+					PacD = new ImageIcon(getClass().getResource("MainFolder/PacU.gif"));
+					PacR = new ImageIcon(getClass().getResource("MainFolder/PacL.gif"));
+					PacL = new ImageIcon(getClass().getResource("MainFolder/PacR.gif"));
+					
+					TtlScrn = new ImageIcon(getClass().getResource("MainFolder/TitleScreen.png"));
+					WnScrn = new ImageIcon(getClass().getResource("MainFolder/WinScreen.png"));
+					LsScrn = new ImageIcon(getClass().getResource("MainFolder/LoseScreen.png"));
+					BlnkScrn = new ImageIcon(getClass().getResource("MainFolder/BlankScreen.png"));
+					
+					for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
+						Ghost[slctIndx].eePics(slctIndx, "MainFolder/GhostR.gif", "MainFolder/GhostB.gif", "MainFolder/GhostP.gif", "MainFolder/GhostO.gif", "MainFolder/PacDth.gif");
+						Ghost[slctIndx].setVulPic(slctIndx, "MainFolder/GhostV.gif", "MainFolder/GhostV.gif", "MainFolder/GhostV.gif", "MainFolder/GhostV.gif");
+						Ghost[slctIndx].setEatPic(slctIndx, "MainFolder/GhostEat.png", "MainFolder/GhostEat.png", "MainFolder/GhostEat.png", "MainFolder/GhostEat.png");
+					}
+					
+					for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+						WallImg[slctIndx] = new ImageIcon(getClass().getResource("MainFolder/PacWall.png"));
+						WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+					}
+					
+					for(slctIndx = 1; slctIndx <= 391; slctIndx++) {
+						if(slctIndx == 1 || slctIndx == 23 || slctIndx == 369 || slctIndx == 391) {
+							PltImg[slctIndx] = new ImageIcon(getClass().getResource("MainFolder/pPellet.png")) ;
+							PltLbl[slctIndx].setIcon(PltImg[slctIndx]);
+						
+						} else {
+							PltImg[slctIndx] = new ImageIcon(getClass().getResource("MainFolder/Pellet.png")) ;
+							PltLbl[slctIndx].setIcon(PltImg[slctIndx]);
+						}
+					}
 					
 					JOptionPane.showMessageDialog(null, "Code " + EECode.toUpperCase() + " was applied \r\nPacman is now moonwalking whereever he goes");
 				
+				} else if(EECode.equalsIgnoreCase("CBrkly")){
+					PacU = new ImageIcon(getClass().getResource("EEfolder/RMoR.png"));
+					PacD = new ImageIcon(getClass().getResource("EEfolder/RMoR.png"));
+					PacR = new ImageIcon(getClass().getResource("EEfolder/RMoR.png"));
+					PacL = new ImageIcon(getClass().getResource("EEfolder/RMoR.png"));
+					
+					TtlScrn = new ImageIcon(getClass().getResource("EEfolder/TitleScreenBark.png"));
+					WnScrn = new ImageIcon(getClass().getResource("EEfolder/WinScreenBark.png"));
+					LsScrn = new ImageIcon(getClass().getResource("EEfolder/LoseScreenBark.png"));
+					BlnkScrn = new ImageIcon(getClass().getResource("EEfolder/BlankScreenBark.png"));
+					
+					for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
+						Ghost[slctIndx].eePics(slctIndx, "EEfolder/GOAT.png", "EEfolder/Dream.png", "EEfolder/Postman.png", "EEfolder/Diesel.png", "EEfolder/RMoRDth.png");
+						Ghost[slctIndx].setVulPic(slctIndx, "EEfolder/GOATV.gif", "EEfolder/DreamV.gif", "EEfolder/PostmanV.gif", "EEfolder/DieselV.gif");
+						Ghost[slctIndx].setEatPic(slctIndx, "EEfolder/GOATEat.png", "EEfolder/DreamEat.png", "EEfolder/PostmanEat.png", "EEfolder/DieselEat.png");
+					}
+					
+					for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+						WallImg[slctIndx] = new ImageIcon(getClass().getResource("EEfolder/PacWallBark.png"));
+						WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+					}
+					
+					for(slctIndx = 1; slctIndx <= 391; slctIndx++) {
+						if(slctIndx == 1 || slctIndx == 23 || slctIndx == 369 || slctIndx == 391) {
+							PltImg[slctIndx] = new ImageIcon(getClass().getResource("EEfolder/pPelletBark.png")) ;
+							PltLbl[slctIndx].setIcon(PltImg[slctIndx]);
+						
+						} else {
+							PltImg[slctIndx] = new ImageIcon(getClass().getResource("EEfolder/PelletBark.png")) ;
+							PltLbl[slctIndx].setIcon(PltImg[slctIndx]);
+						}
+					}
+					
+					JOptionPane.showMessageDialog(null, "Code " + EECode.toUpperCase() + " was applied \r\nGo Help Chuck Chase some rings");
+				
 				} else {
+					PacU = new ImageIcon(getClass().getResource("MainFolder/PacU.gif"));
+					PacD = new ImageIcon(getClass().getResource("MainFolder/PacD.gif"));
+					PacR = new ImageIcon(getClass().getResource("MainFolder/PacR.gif"));
+					PacL = new ImageIcon(getClass().getResource("MainFolder/PacL.gif"));
+					
+					TtlScrn = new ImageIcon(getClass().getResource("MainFolder/TitleScreen.png"));
+					WnScrn = new ImageIcon(getClass().getResource("MainFolder/WinScreen.png"));
+					LsScrn = new ImageIcon(getClass().getResource("MainFolder/LoseScreen.png"));
+					BlnkScrn = new ImageIcon(getClass().getResource("MainFolder/BlankScreen.png"));
+					
+					for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
+						Ghost[slctIndx].resetPics();
+					}
+					
+					for(slctIndx = 1; slctIndx <= 13; slctIndx++) {
+						WallImg[slctIndx] = new ImageIcon(getClass().getResource("MainFolder/PacWall.png"));
+						WallLbl[slctIndx].setIcon(WallImg[slctIndx]);
+					}
+					
+					for(slctIndx = 1; slctIndx <= 391; slctIndx++) {
+						if(slctIndx == 1 || slctIndx == 23 || slctIndx == 369 || slctIndx == 391) {
+							PltImg[slctIndx] = new ImageIcon(getClass().getResource("MainFolder/pPellet.png")) ;
+							PltLbl[slctIndx].setIcon(PltImg[slctIndx]);
+						
+						} else {
+							PltImg[slctIndx] = new ImageIcon(getClass().getResource("MainFolder/Pellet.png")) ;
+							PltLbl[slctIndx].setIcon(PltImg[slctIndx]);
+						}
+					}
+					
 					//testing if nothing or something that doesn't match a code is entered and reseting animations to normal
 					if(EECode.equalsIgnoreCase("")) {
-						PacU = new ImageIcon(getClass().getResource("PacU.gif"));
-						PacD = new ImageIcon(getClass().getResource("PacD.gif"));
-						PacR = new ImageIcon(getClass().getResource("PacR.gif"));
-						PacL = new ImageIcon(getClass().getResource("PacL.gif"));
-						
-						for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
-							Ghost[slctIndx].setPics();
-						}
-						
 						JOptionPane.showMessageDialog(null,"No code was entered, resetting to game default");
-						
+					
 					} else {
-						PacU = new ImageIcon(getClass().getResource("PacU.gif"));
-						PacD = new ImageIcon(getClass().getResource("PacD.gif"));
-						PacR = new ImageIcon(getClass().getResource("PacR.gif"));
-						PacL = new ImageIcon(getClass().getResource("PacL.gif"));
-						
-						for(slctIndx = 1; slctIndx <= 4; slctIndx++) {
-							Ghost[slctIndx].eePics(slctIndx, "GhostR.gif", "GhostB.gif", "GhostP.gif", "GhostO.gif");
-						}
-						
 						JOptionPane.showMessageDialog(null,"Invalid code was entered, resetting to game default");
 					}
 				}
@@ -644,21 +703,27 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	public void codeScreen() {
-		bgImg = new ImageIcon(getClass().getResource("BlankScreen.png"));
-		
 		//if the start button is visible it sends the user to the code menu
 		if(StartBttn.isVisible()) {
+			bgImg = BlnkScrn;
+			bgAll.setIcon(bgImg);
+			
 			StartBttn.setVisible(false);
 			ExtraBttn.setText("Enter");
 			CodeInpt.setVisible(true);
 			CodeInpt.setFocusable(true);
+			ExitBttn.setText("Back");
 			
 		//if the start button is not visible it sends the user to the main menu
 		} else if(!StartBttn.isVisible()) {
+			bgImg = TtlScrn;
+			bgAll.setIcon(bgImg);
+			
 			StartBttn.setVisible(true);
 			ExtraBttn.setText("Extras");
 			CodeInpt.setVisible(false);
 			CodeInpt.setFocusable(false);
+			ExitBttn.setText("Exit");
 		}
 	}
 	
@@ -668,14 +733,14 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		startScreen();
 		
 		//creating and displaying the databases data
-		ResultSet rs = lbCreate();
-		String Disp = DisplayRecords(rs);
+		lbCreate();
+		String Disp = DisplayRecords();
 		Disp += "You lose, your score was " + Score + ".\r\nPlease enter a name(6 letters)";
 		
 		//telling the user that they lost and what their score is. The user is to enter a 6 letter name to enter the score under
 		String nameIn = JOptionPane.showInputDialog(null, Disp);
 		
-		Disp = DisplayRecords(rs);
+		Disp = DisplayRecords();
 		Disp += " Invalid name was entered.\r\nPlease enter a name(6 letters)";
 		//if the name is not 6 letters long then asking the user to re-input a name
 		if(nameIn.length() != 6) {
@@ -694,14 +759,14 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		startScreen();
 		
 		//creating and displaying the databases data
-		ResultSet rs = lbCreate();
-		String Disp = DisplayRecords(rs);
+		lbCreate();
+		String Disp = DisplayRecords();
 		Disp += "You Win!!! Your score was " + Score + ".\r\n Please enter a name(6 letters)";
 		
 		//telling the user that they lost and what their score is. The user is to enter a 6 letter name to enter the score under
 		String nameIn = JOptionPane.showInputDialog(null, Disp);
 		
-		Disp = DisplayRecords(rs);
+		Disp = DisplayRecords();
 		Disp += "   Invalid name was entered.\r\nPlease enter a new name(6 letters)";
 		//if the name is not 6 letters long then asking the user to re-input a name
 		while(nameIn.length() != 6) {
@@ -715,11 +780,10 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 		startScreen();
 	}
 
-	public ResultSet lbCreate() {
+	public void lbCreate() {
 		//setting variables to be used for the database connection
 		Connection conn = null;
 		Statement stmt = null;
-		ResultSet rs = null;
 		
 		//trying to open and connect to the leaderboard database
 		try {
@@ -739,8 +803,57 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 				stmt.executeUpdate(sql);
 				conn.commit();
 				
+				//closing the connection
+				conn.close();
+			}
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public String DisplayRecords() throws SQLException{
+		//setting up variables to be used throughout the display function
+		int id = 0;
+		String FullString = "";
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		//trying to connect to the database
+		try {
+			Class.forName("org.sqlite.JDBC");
+			String dbURL = "jdbc:sqlite:leaderboard.db";
+			conn = DriverManager.getConnection(dbURL);
+					
+		
+			//using the FullString variable to add all data to one string so that it can all be displayed in one dialog box
+			FullString += "                  LeaderBoard\r\n==========================\r\n";
+			
+			if (conn != null) {
+				conn.setAutoCommit(false);
+				stmt = conn.createStatement();
+				
 				//sorting the data in the leaderboards and displaying the top 5 scores
 				rs = stmt.executeQuery("SELECT * FROM PLAYER ORDER BY SCORE DESC LIMIT 5");
+				
+				//looping through the five entries
+				while (rs.next()) {
+					//upping the ID so that it can be displayed with each entry
+					id++;
+					String name = rs.getString("name");
+					int score = rs.getInt("score");
+					
+					//adding the entry to the FullString variable
+					FullString += "           " + id + ") " + name + " - " + score +"\r\n";
+				}
+				
+				FullString += "\r\n";
+				
 				rs.close();
 				
 				//closing the connection
@@ -752,28 +865,6 @@ public class GameScreen extends JFrame implements ActionListener, KeyListener {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
-		return rs;
-	}
-	
-	public static String DisplayRecords(ResultSet rs) throws SQLException{
-		//setting up variables to be used throughout the display function
-		int id = 0;
-		String FullString = "";
-		
-		//using the FullString variable to add all data to one string so that it can all be displayed in one dialog box
-		FullString += "                  LeaderBoard\r\n==========================\r\n";
-		
-		//looping through the five entries
-		while (rs.next()) {
-			//upping the ID so that it can be displayed with each entry
-			id++;
-			String name = rs.getString("name");
-			int score = rs.getInt("score");
-			
-			//adding the entry to the FullString variable
-			FullString += "  " + id + ") " + name + " - " + score +"\r\n";
 		}
 		
 		return FullString;
