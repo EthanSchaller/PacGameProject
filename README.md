@@ -3,10 +3,10 @@ Pacman game for PROG2200
 
 Ghost Movements:
 
-Blinky (Red) - Random movement that is influenced by Pacmans position | Speed: ●●○
-Pinky (Pink) - Moves in a circle around the perimeter                 | Speed: ●●●
-Inky (Blue) - Random movement that is influenced by Pacmans position  | Speed: ●●○
-Clyde (Orange) - Moves through walls directly towards pacman          | Speed: ●○○
+Blinky (Red) - Random movement that is influenced by Pacmans position | Speed: ●●○<br/>
+Pinky (Pink) - Moves in a circle around the perimeter                 | Speed: ●●●<br/>
+Inky (Blue) - Random movement that is influenced by Pacmans position  | Speed: ●●○<br/>
+Clyde (Orange) - Moves through walls directly towards pacman          | Speed: ●○○<br/>
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
